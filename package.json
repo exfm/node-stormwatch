@@ -1,0 +1,20 @@
+{
+  "author": " <>",
+  "name": "node-stormwatch",
+  "description": "CloudWatch client and metrics gatherer",
+  "version": "0.0.0",
+  "homepage": "http://github.com/exfm/node-stormwatch",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/exfm/node-stormwatch.git"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
