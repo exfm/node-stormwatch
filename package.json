@@ -14,7 +14,6 @@
   "dependencies": {
     "express": "3.0.0rc5",
     "when": "git://github.com/exfm/when.git",
-    "plata": "git://github.com/exfm/node-plata.git",
     "superagent": "0.9.7",
     "junto": "git+ssh://git@github.com/exfm/node-junto.git"
   },
