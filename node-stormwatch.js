@@ -11,7 +11,8 @@ var aws = require('plata'),
 	server = require('http').createServer(app),
 	io = require('socket.io').listen(server),
 	config,
-	sockets = {};
+	sockets = {},
+	cloudData = {};
 
 getConfig('development').then(function(c){
 	config = c;
@@ -25,14 +26,17 @@ app.get('/', function(req, res){
 server.listen(3000);
 console.log('Listening on port 3000');
 
+
 io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
-    getNewData();
+    sendData(cloudData);
 });
 
 io.sockets.on('disconnect', function(socket){
     delete sockets[socket.id];
 });
+
+getNewData();
 
 setInterval(function(){
 	getNewData();
@@ -48,7 +52,8 @@ function getNewData(){
 			'Average': '1'}, 'Seconds', {
 			'LoadBalancerName': 'production'
 		}).then(function(data){
-			sendData(data.getMetricStatisticsResponse.getMetricStatisticsResult);
+			sendData(formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult));
+			cloudData = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult);
 		});
 	});
 }
@@ -57,4 +62,13 @@ function sendData(data) {
 	for (var socket in sockets) {
 		sockets[socket].emit('newData', data);
 	}
+}
+
+function formatData(data){
+	var asc = data.datapoints.sort(function(a,b){
+		a = new Date(a.timestamp);
+		b = new Date(b.timestamp);
+		return a-b;
+	});
+	return asc;
 }

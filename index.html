@@ -3,10 +3,26 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
-		var socket = io.connect('http://localhost:3000');
+		var socket = io.connect('http://localhost:3000'),
+			xdata = [],
+			ydata = [],
+			timestamp;
+
 		socket.on('newData', function(data){
-			console.log(data);
-		})
+
+			xdata = [];
+			ydata = [];
+			data.forEach(function(pnt){
+				xdata.push(new Date(pnt.timestamp));
+				ydata.push(pnt.average);
+			});
+			console.log(xdata);
+			console.log(ydata);
+		});
+
 		</script>
 	</head>
+	<body>
+
+	</body>
 </html>
