@@ -33,7 +33,7 @@ var aws = require('plata'),
 			'metricType': 'Sum',
 			'unit': 'Count',
 			'unitLabel': '',
-			'range': [0, 10000],
+			'range': [null, null],
 			'loadBalancerName': 'production'
 		},
 		{
@@ -83,7 +83,15 @@ console.log('Listening on port 3000');
 
 io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
-    sockets[socket.id].emit('newData', cloudData);
+    socket.emit('newData', cloudData);
+    socket.on('changeParams', function(data){
+    	console.log(data);
+    	var startTime = new Date(new Date().getTime() - 1000*60*data.timeRange),
+    		interval = 2*data.timeRange;
+    	getNewData(startTime, interval).then(function(newData){
+    		socket.emit('newData', newData);
+    	});
+    })
 });
 
 io.sockets.on('disconnect', function(socket){
@@ -91,15 +99,16 @@ io.sockets.on('disconnect', function(socket){
 });
 
 var startTime = new Date(new Date().getTime() - 1000*60*60);
-getNewData(startTime, 60);
+getNewData(startTime, 60).then(sendData);
 
 setInterval(function(){
 	console.log('refreshing...');
 	var startTime = new Date(new Date().getTime() - 1000*60*60)
-	getNewData(startTime, 60);
+	getNewData(startTime, 60).then(sendData);
 }, 60000);
 
 function getNewData(startTime, interval){
+	var p = when.defer();
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next){
@@ -120,15 +129,18 @@ function getNewData(startTime, interval){
 					'datapoints': datapoints,
 					'unitLabel': cloudMetric.unitLabel,
 					'range': cloudMetric.range,
-					'loadBalancerName': cloudMetric.loadBalancerName
+					'loadBalancerName': cloudMetric.loadBalancerName,
+					'interval': interval,
+					'metricType': cloudMetric.metricType
 				}
 				d.resolve();
 			});
 			return d.promise;
 		})).then(function(){
-			sendData(cloudData);
+			p.resolve(cloudData);
 		});
 	});
+	return p.promise;
 }
 
 function sendData(data) {

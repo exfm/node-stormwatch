@@ -6,11 +6,13 @@
         <script src="http://code.highcharts.com/highcharts.js"></script>
         <script>
             var socket = io.connect('http://localhost:3000'),
-                charts = {};
+                charts = {},
+                subtitleString;
 
             socket.on('newData', function(newData){
                 for (metricName in newData) {
                     dataArray = [];
+                    subtitleString = newData[metricName].metricType+', interval '+newData[metricName].interval+'s';
                     newData[metricName].datapoints.forEach(function(pnt){
                         var date = new Date(pnt.timestamp);
                         dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
@@ -27,6 +29,9 @@
                         },
                         title: {
                             text: newData[metricName].name
+                        },
+                        subtitle: {
+                            text: subtitleString
                         },
                         xAxis: {
                             type: 'datetime',
@@ -59,10 +64,27 @@
  
             });
 
+            $(document).ready(function(){
+                $("#timeRange").change(function(){
+                    var newRange = $("#timeRange").val();
+                    socket.emit('changeParams', {
+                        'timeRange': newRange
+                    })
+                })
+            })
+
         </script>
 
     </head>
     <body>
+        minutes: 
+        <select id="timeRange">
+            <option value="30">30</option>
+            <option value="60">60</option>
+            <option value="120">120</option>
+            <option value="240">240</option>
+        </select>
+        <br>
         <div id="ELBLatency" style="height: 400px"></div>​
         <div id="ELBRequestCount" style="height: 400px"></div>​
         <div id="ELBHealthyHostCount" style="height: 400px"></div>​
