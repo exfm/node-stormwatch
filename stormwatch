@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 "use strict";
 
 var aws = require('plata'),
@@ -43,27 +45,27 @@ var aws = require('plata'),
 			'unitLabel': '',
 			'range': [0, 10],
 			'loadBalancerName': 'production'
-		},
-		{
-			'name': 'ELBUnhealthyHostCount',
-			'namespace': 'AWS/ELB',
-			'metricName': 'UnhealthyHostCount',
-			'metricType': 'Average',
-			'unit': 'Count',
-			'unitLabel': '',
-			'range': [null, null],
-			'loadBalancerName': 'production'
-		},
-		{
-			'name': 'ELBServerErrors',
-			'namespace': 'AWS/ELB',
-			'metricName': 'HTTPCode_ELB_5XX',
-			'metricType': 'Sum',
-			'unit': 'Count',
-			'unitLabel': '',
-			'range': [null, null],
-			'loadBalancerName': 'production'
 		}
+		// {
+		// 	'name': 'ELBUnhealthyHostCount',
+		// 	'namespace': 'AWS/ELB',
+		// 	'metricName': 'UnhealthyHostCount',
+		// 	'metricType': 'Average',
+		// 	'unit': 'Count',
+		// 	'unitLabel': '',
+		// 	'range': [null, null],
+		// 	'loadBalancerName': 'production'
+		// },
+		// {
+		// 	'name': 'ELBServerErrors',
+		// 	'namespace': 'AWS/ELB',
+		// 	'metricName': 'HTTPCode_ELB_5XX',
+		// 	'metricType': 'Sum',
+		// 	'unit': 'Count',
+		// 	'unitLabel': '',
+		// 	'range': [null, null],
+		// 	'loadBalancerName': 'production'
+		// }
 	];
 
 getConfig('development').then(function(c){
@@ -81,7 +83,7 @@ console.log('Listening on port 3000');
 
 io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
-    socket.emit('newData', cloudData);
+    sockets[socket.id].emit('newData', cloudData);
 });
 
 io.sockets.on('disconnect', function(socket){
@@ -92,6 +94,7 @@ var startTime = new Date(new Date().getTime() - 1000*60*60);
 getNewData(startTime, 60);
 
 setInterval(function(){
+	console.log('refreshing...');
 	var startTime = new Date(new Date().getTime() - 1000*60*60)
 	getNewData(startTime, 60);
 }, 60000);
@@ -122,13 +125,14 @@ function getNewData(startTime, interval){
 				d.resolve();
 			});
 			return d.promise;
-		})).then(next);
-	}).then(function(next, data){
-		sendData(cloudData);
-	})
+		})).then(function(){
+			sendData(cloudData);
+		});
+	});
 }
 
 function sendData(data) {
+	console.log('sending data');
 	for (var socket in sockets) {
 		sockets[socket].emit('newData', data);
 	}
