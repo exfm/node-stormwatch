@@ -79,8 +79,9 @@ app.get('/', function(req, res){
 
 app.get('/info', function(req, res){
 	getNewData(30, 1).then(function(data){
+		var datapoints = data.ELBLatency.datapoints;
 		res.json({
-			'latency': data.ELBLatency.datapoints[0].value
+			'latency': datapoints[datapoints.length-1].value
 		})
 	});
 	
