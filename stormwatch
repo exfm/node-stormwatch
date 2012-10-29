@@ -85,9 +85,13 @@ io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
     socket.emit('newData', cloudData);
     socket.on('changeParams', function(data){
-    	console.log(data);
-    	var interval = 2*data.timeRange;
-    	getNewData(data.timeRange, interval).then(function(newData){
+    	var rangeInMinutes = convertToMinutes(data.timeRange),
+    		interval = rangeInMinutes/30;
+
+    	console.log(rangeInMinutes);
+    	console.log(interval);
+
+    	getNewData(rangeInMinutes, interval).then(function(newData){
     		socket.emit('newData', newData);
     	});
     })
@@ -97,11 +101,11 @@ io.sockets.on('disconnect', function(socket){
     delete sockets[socket.id];
 });
 
-getNewData(30, 60).then(sendData);
+getNewData(30, 1).then(sendData);
 
 setInterval(function(){
 	console.log('refreshing...');
-	getNewData(30, 60).then(sendData);
+	getNewData(30, 1).then(sendData);
 }, 60000);
 
 function getNewData(timeRangeMinutes, interval){
@@ -117,7 +121,7 @@ function getNewData(timeRangeMinutes, interval){
 				statistic = {};
 			statistic[cloudMetric.metricType] = '1';
 			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
-				interval, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit, {
+				interval*60, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit, {
 				'LoadBalancerName': cloudMetric.loadBalancerName
 			}).then(function(data){
 				var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
@@ -166,4 +170,16 @@ function formatData(data){
 	});
 	console.log(formatted);
 	return formatted;
+}
+
+function convertToMinutes(timeRange) {
+	switch(timeRange.split('')[timeRange.length-1]) {
+		case 'm':
+			return timeRange.split('m')[0];
+		case 'h':
+			return timeRange.split('h')[0]*60;
+		case 'd':
+			return timeRange.split('d')[0]*60*24;
+	}
+	return timeRange;
 }

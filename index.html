@@ -7,13 +7,13 @@
         <script>
             var socket = io.connect('http://localhost:3000'),
                 charts = {},
-                subtitleString,
-                timeRange = 30;
+                subtitleString;
 
             socket.on('newData', function(newData){
+                $("#loading").text('');
                 for (metricName in newData) {
                     dataArray = [];
-                    subtitleString = newData[metricName].metricType+', '+newData[metricName].interval+'s intervals over past '+newData[metricName].timeRange+' minutes';
+                    subtitleString = newData[metricName].metricType+', '+newData[metricName].interval+'m intervals over past '+$("#timeRange").val();
                     newData[metricName].datapoints.forEach(function(pnt){
                         var date = new Date(pnt.timestamp);
                         dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
@@ -70,7 +70,8 @@
                     var newRange = $("#timeRange").val();
                     socket.emit('changeParams', {
                         'timeRange': newRange
-                    })
+                    });
+                    $("#loading").text('loading...');
                 })
             })
 
@@ -78,13 +79,17 @@
 
     </head>
     <body>
-        minutes: 
+        time range: 
         <select id="timeRange">
-            <option value="30">30</option>
-            <option value="60">60</option>
-            <option value="120">120</option>
-            <option value="240">240</option>
+            <option value="30m">30m</option>
+            <option value="1h">1h</option>
+            <option value="2h">2h</option>
+            <option value="4h">4h</option>
+            <option value="12h">12h</option>
+            <option value="1d">1d</option>
+            <option value="7d">7d</option>
         </select>
+        <span id="loading"></span>
         <br>
         <div id="ELBLatency" style="height: 400px"></div>​
         <div id="ELBRequestCount" style="height: 400px"></div>​
