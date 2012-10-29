@@ -7,12 +7,13 @@
         <script>
             var socket = io.connect('http://localhost:3000'),
                 charts = {},
-                subtitleString;
+                subtitleString,
+                timeRange = 30;
 
             socket.on('newData', function(newData){
                 for (metricName in newData) {
                     dataArray = [];
-                    subtitleString = newData[metricName].metricType+', interval '+newData[metricName].interval+'s';
+                    subtitleString = newData[metricName].metricType+', '+newData[metricName].interval+'s intervals over past '+newData[metricName].timeRange+' minutes';
                     newData[metricName].datapoints.forEach(function(pnt){
                         var date = new Date(pnt.timestamp);
                         dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
@@ -28,7 +29,7 @@
                             }
                         },
                         title: {
-                            text: newData[metricName].name
+                            text: newData[metricName].namespace+' '+newData[metricName].metricName
                         },
                         subtitle: {
                             text: subtitleString
@@ -42,7 +43,7 @@
                         },
                         yAxis: {
                             title: {
-                                text: metricName
+                                text: newData[metricName].metricName
                             },
                             labels: {
                                 formatter: function() {

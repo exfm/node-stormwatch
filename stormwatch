@@ -86,9 +86,8 @@ io.sockets.on('connection', function(socket){
     socket.emit('newData', cloudData);
     socket.on('changeParams', function(data){
     	console.log(data);
-    	var startTime = new Date(new Date().getTime() - 1000*60*data.timeRange),
-    		interval = 2*data.timeRange;
-    	getNewData(startTime, interval).then(function(newData){
+    	var interval = 2*data.timeRange;
+    	getNewData(data.timeRange, interval).then(function(newData){
     		socket.emit('newData', newData);
     	});
     })
@@ -98,17 +97,16 @@ io.sockets.on('disconnect', function(socket){
     delete sockets[socket.id];
 });
 
-var startTime = new Date(new Date().getTime() - 1000*60*60);
-getNewData(startTime, 60).then(sendData);
+getNewData(30, 60).then(sendData);
 
 setInterval(function(){
 	console.log('refreshing...');
-	var startTime = new Date(new Date().getTime() - 1000*60*60)
-	getNewData(startTime, 60).then(sendData);
+	getNewData(30, 60).then(sendData);
 }, 60000);
 
-function getNewData(startTime, interval){
-	var p = when.defer();
+function getNewData(timeRangeMinutes, interval){
+	var p = when.defer(),
+		startTime = new Date(new Date().getTime() - 1000*60*timeRangeMinutes);
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next){
@@ -125,12 +123,14 @@ function getNewData(startTime, interval){
 				var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
 					name = cloudMetric.namespace+' '+cloudMetric.metricName;
 				cloudData[cloudMetric.name] = {
-					'name': name,
+					'namespace': cloudMetric.namespace,
+					'metricName': cloudMetric.metricName,
 					'datapoints': datapoints,
 					'unitLabel': cloudMetric.unitLabel,
 					'range': cloudMetric.range,
 					'loadBalancerName': cloudMetric.loadBalancerName,
 					'interval': interval,
+					'timeRange': timeRangeMinutes,
 					'metricType': cloudMetric.metricType
 				}
 				d.resolve();
