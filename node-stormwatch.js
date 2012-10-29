@@ -12,7 +12,54 @@ var aws = require('plata'),
 	io = require('socket.io').listen(server),
 	config,
 	sockets = {},
-	cloudData = {};
+	cloudData = {},
+	metrics = [
+		{
+			'name': 'ELBLatency',
+			'namespace': 'AWS/ELB',
+			'metricName': 'Latency',
+			'metricType': 'Average',
+			'unit': 'Seconds',
+			'unitLabel': 's',
+			'loadBalancerName': 'production'
+		},
+		{
+			'name': 'ELBRequestCount',
+			'namespace': 'AWS/ELB',
+			'metricName': 'RequestCount',
+			'metricType': 'Sum',
+			'unit': 'Count',
+			'unitLabel': '',
+			'loadBalancerName': 'production'
+		},
+		{
+			'name': 'ELBHealthyHostCount',
+			'namespace': 'AWS/ELB',
+			'metricName': 'HealthyHostCount',
+			'metricType': 'Average',
+			'unit': 'Count',
+			'unitLabel': '',
+			'loadBalancerName': 'production'
+		},
+		{
+			'name': 'ELBUnhealthyHostCount',
+			'namespace': 'AWS/ELB',
+			'metricName': 'UnhealthyHostCount',
+			'metricType': 'Average',
+			'unit': 'Count',
+			'unitLabel': '',
+			'loadBalancerName': 'production'
+		},
+		{
+			'name': 'ELBServerErrors',
+			'namespace': 'AWS/ELB',
+			'metricName': 'HTTPCode_ELB_5XX',
+			'metricType': 'Sum',
+			'unit': 'Count',
+			'unitLabel': '',
+			'loadBalancerName': 'production'
+		}
+	];
 
 getConfig('development').then(function(c){
 	config = c;
@@ -36,26 +83,44 @@ io.sockets.on('disconnect', function(socket){
     delete sockets[socket.id];
 });
 
-getNewData();
+var startTime = new Date(new Date().getTime() - 1000*60*60);
+getNewData(startTime, 60);
 
 setInterval(function(){
-	getNewData();
+	var startTime = new Date(new Date().getTime() - 1000*60*60)
+	getNewData(startTime, 60);
 }, 60000);
 
-function getNewData(){
+function getNewData(startTime, interval){
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next){
-		var startTime = new Date(new Date().getTime() - 1000*60*60),
-			endTime = new Date();
-		aws.cloudWatch.getMetricStatistics('AWS/ELB', 'Latency', 60, startTime.toISOString(), endTime.toISOString(), {
-			'Average': '1'}, 'Seconds', {
-			'LoadBalancerName': 'production'
-		}).then(function(data){
-			sendData(formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult));
-			cloudData = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult);
-		});
-	});
+		// load balancer metrics
+		var endTime = new Date();
+		when.all(metrics.map(function(cloudMetric){
+			var d = when.defer(),
+				statistic = {};
+			statistic[cloudMetric.metricType] = '1';
+			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
+				interval, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit, {
+				'LoadBalancerName': cloudMetric.loadBalancerName
+			}).then(function(data){
+				var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
+					name = cloudMetric.namespace+' '+cloudMetric.metricName;
+				cloudData[cloudMetric.name] = {
+					'name': name,
+					'datapoints': datapoints,
+					'unitLabel': cloudMetric.unitLabel,
+					'loadBalancerName': cloudMetric.loadBalancerName
+				}
+				d.resolve();
+			});
+			return d.promise;
+		})).then(next);
+	}).then(function(next, data){
+		sendData(cloudData);
+		console.log(cloudData);
+	})
 }
 
 function sendData(data) {
@@ -69,6 +134,15 @@ function formatData(data){
 		a = new Date(a.timestamp);
 		b = new Date(b.timestamp);
 		return a-b;
+	}),
+		formatted = [];
+
+	asc.forEach(function(item){
+		formatted.push({
+			'timestamp': item.timestamp,
+			'value': item.sum || item.average
+		})
 	});
-	return asc;
+	console.log(formatted);
+	return formatted;
 }

@@ -5,62 +5,58 @@
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script src="http://code.highcharts.com/highcharts.js"></script>
         <script>
-            var socket = io.connect('http://drew-dev.ex.fm:3000'),
-                chart,
-                dataArray = [];
+            var socket = io.connect('http://localhost:3000'),
+                charts = {};
 
             socket.on('newData', function(newData){
-                dataArray = [];
-                newData.forEach(function(pnt){
-                    // var date = new Date(pnt.timestamp);
-                    // pnt.date = date;
-                    // pnt.average = pnt.average;
-                    var date = new Date(pnt.timestamp);
-                    dataArray.push([date.getTime(), parseFloat(pnt.average, 10)])
-                });
-
-                chart = new Highcharts.Chart({
-                    chart: {
-                        renderTo: 'container',
-                        type: 'spline',
-                        inverted: false,
-                        width: 500,
-                        style: {
-                            margin: '0 auto'
-                        }
-                    },
-                    title: {
-                        text: 'Latency vs. Time'
-                    },
-                    subtitle: {
-                        text: 'production load balancer'
-                    }
-                    xAxis: {
-                        type: 'datetime',
-                        title: {
-                            enabled: true,
-                            text: 'Time'
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Latency'
-                        },
-                        labels: {
-                            formatter: function() {
-                                return this.value + 's';
+                for (metricName in newData) {
+                    dataArray = [];
+                    newData[metricName].datapoints.forEach(function(pnt){
+                        var date = new Date(pnt.timestamp);
+                        dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
+                    });
+                    charts[metricName] = new Highcharts.Chart({
+                        chart: {
+                            renderTo: metricName,
+                            type: 'spline',
+                            inverted: false,
+                            width: 500,
+                            style: {
+                                margin: '0 auto'
                             }
-                        }
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    series: [{
-                        data: dataArray
-                    }],
-                        name: 'prod ELB'
-                });
+                        },
+                        title: {
+                            text: newData[metricName].name
+                        },
+                        xAxis: {
+                            type: 'datetime',
+                            title: {
+                                enabled: true,
+                                text: 'Time'
+                            }
+                        },
+                        yAxis: {
+                            title: {
+                                text: metricName
+                            },
+                            labels: {
+                                formatter: function() {
+                                    return this.value + newData[metricName].unitLabel;
+                                }
+                            }
+                        },
+                        legend: {
+                            enabled: false
+                        },
+                        series: [{
+                            data: dataArray
+                        }]
+                    });
+                }
+ 
             });
+
+            
                 
                 
         </script>
@@ -71,8 +67,10 @@
         </style>
     </head>
     <body>
-
-        <div id="container" style="height: 400px"></div>​
-
+        <div id="ELBLatency" style="height: 400px"></div>​
+        <div id="ELBRequestCount" style="height: 400px"></div>​
+        <div id="ELBHealthyHostCount" style="height: 400px"></div>​
+        <div id="ELBUnhealthyHostCount" style="height: 400px"></div>​
+        <div id="ELBServerErrors" style="height: 400px"></div>​
     </body>
 </html>
