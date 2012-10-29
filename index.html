@@ -5,7 +5,7 @@
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script src="http://code.highcharts.com/highcharts.js"></script>
         <script>
-            var socket = io.connect('http://localhost:3000'),
+            var socket = io.connect('http://drew-dev.ex.fm:3000'),
                 chart,
                 dataArray = [];
 
@@ -32,6 +32,9 @@
                     title: {
                         text: 'Latency vs. Time'
                     },
+                    subtitle: {
+                        text: 'production load balancer'
+                    }
                     xAxis: {
                         type: 'datetime',
                         title: {
@@ -54,7 +57,8 @@
                     },
                     series: [{
                         data: dataArray
-                    }]
+                    }],
+                        name: 'prod ELB'
                 });
             });
                 
