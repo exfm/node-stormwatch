@@ -46,7 +46,7 @@ function getNewData(){
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next){
-		var startTime = new Date(new Date().getTime() - 1200000),
+		var startTime = new Date(new Date().getTime() - 1000*60*60),
 			endTime = new Date();
 		aws.cloudWatch.getMetricStatistics('AWS/ELB', 'Latency', 60, startTime.toISOString(), endTime.toISOString(), {
 			'Average': '1'}, 'Seconds', {

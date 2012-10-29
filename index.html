@@ -1,28 +1,74 @@
 <html>
-	<head>
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript">
-		var socket = io.connect('http://localhost:3000'),
-			xdata = [],
-			ydata = [],
-			timestamp;
+    <head>
+        <title>StormWatch</title>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+        <script>
+            var socket = io.connect('http://localhost:3000'),
+                chart,
+                dataArray = [];
 
-		socket.on('newData', function(data){
+            socket.on('newData', function(newData){
+                dataArray = [];
+                newData.forEach(function(pnt){
+                    // var date = new Date(pnt.timestamp);
+                    // pnt.date = date;
+                    // pnt.average = pnt.average;
+                    var date = new Date(pnt.timestamp);
+                    dataArray.push([date.getTime(), parseFloat(pnt.average, 10)])
+                });
 
-			xdata = [];
-			ydata = [];
-			data.forEach(function(pnt){
-				xdata.push(new Date(pnt.timestamp));
-				ydata.push(pnt.average);
-			});
-			console.log(xdata);
-			console.log(ydata);
-		});
+                chart = new Highcharts.Chart({
+                    chart: {
+                        renderTo: 'container',
+                        type: 'spline',
+                        inverted: false,
+                        width: 500,
+                        style: {
+                            margin: '0 auto'
+                        }
+                    },
+                    title: {
+                        text: 'Latency vs. Time'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        title: {
+                            enabled: true,
+                            text: 'Time'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Latency'
+                        },
+                        labels: {
+                            formatter: function() {
+                                return this.value + 's';
+                            }
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    series: [{
+                        data: dataArray
+                    }]
+                });
+            });
+                
+                
+        </script>
 
-		</script>
-	</head>
-	<body>
 
-	</body>
+        <style type="text/css">
+
+        </style>
+    </head>
+    <body>
+
+        <div id="container" style="height: 400px"></div>​
+
+    </body>
 </html>
