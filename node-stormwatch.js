@@ -21,6 +21,7 @@ var aws = require('plata'),
 			'metricType': 'Average',
 			'unit': 'Seconds',
 			'unitLabel': 's',
+			'range': [0, 5],
 			'loadBalancerName': 'production'
 		},
 		{
@@ -30,6 +31,7 @@ var aws = require('plata'),
 			'metricType': 'Sum',
 			'unit': 'Count',
 			'unitLabel': '',
+			'range': [0, 10000],
 			'loadBalancerName': 'production'
 		},
 		{
@@ -39,6 +41,7 @@ var aws = require('plata'),
 			'metricType': 'Average',
 			'unit': 'Count',
 			'unitLabel': '',
+			'range': [0, 10],
 			'loadBalancerName': 'production'
 		},
 		{
@@ -48,6 +51,7 @@ var aws = require('plata'),
 			'metricType': 'Average',
 			'unit': 'Count',
 			'unitLabel': '',
+			'range': [null, null],
 			'loadBalancerName': 'production'
 		},
 		{
@@ -57,6 +61,7 @@ var aws = require('plata'),
 			'metricType': 'Sum',
 			'unit': 'Count',
 			'unitLabel': '',
+			'range': [null, null],
 			'loadBalancerName': 'production'
 		}
 	];
@@ -76,7 +81,7 @@ console.log('Listening on port 3000');
 
 io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
-    sendData(cloudData);
+    socket.emit('newData', cloudData);
 });
 
 io.sockets.on('disconnect', function(socket){
@@ -111,6 +116,7 @@ function getNewData(startTime, interval){
 					'name': name,
 					'datapoints': datapoints,
 					'unitLabel': cloudMetric.unitLabel,
+					'range': cloudMetric.range,
 					'loadBalancerName': cloudMetric.loadBalancerName
 				}
 				d.resolve();
@@ -119,7 +125,6 @@ function getNewData(startTime, interval){
 		})).then(next);
 	}).then(function(next, data){
 		sendData(cloudData);
-		console.log(cloudData);
 	})
 }
 

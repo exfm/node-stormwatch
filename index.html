@@ -43,7 +43,9 @@
                                 formatter: function() {
                                     return this.value + newData[metricName].unitLabel;
                                 }
-                            }
+                            },
+                            min: newData[metricName].range[0],
+                            max: newData[metricName].range[1]
                         },
                         legend: {
                             enabled: false
@@ -52,25 +54,19 @@
                             data: dataArray
                         }]
                     });
+
                 }
  
             });
 
-            
-                
-                
         </script>
 
-
-        <style type="text/css">
-
-        </style>
     </head>
     <body>
         <div id="ELBLatency" style="height: 400px"></div>​
         <div id="ELBRequestCount" style="height: 400px"></div>​
         <div id="ELBHealthyHostCount" style="height: 400px"></div>​
-        <div id="ELBUnhealthyHostCount" style="height: 400px"></div>​
-        <div id="ELBServerErrors" style="height: 400px"></div>​
+<!--         <div id="ELBUnhealthyHostCount" style="height: 400px"></div>​
+        <div id="ELBServerErrors" style="height: 400px"></div>​ -->
     </body>
 </html>
