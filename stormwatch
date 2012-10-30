@@ -15,7 +15,7 @@ var aws = require('plata'),
 	config,
 	sockets = {},
 	cloudData = {},
-	metrics = [
+	ELBMetrics = [
 		{
 			'name': 'ELBLatency',
 			'namespace': 'AWS/ELB',
@@ -66,6 +66,17 @@ var aws = require('plata'),
 		// 	'range': [null, null],
 		// 	'loadBalancerName': 'production'
 		// }
+	],
+	EC2Metrics = [
+		{
+			'name': 'EC2CPUUtilization',
+			'namespace': 'AWS/EC2',
+			'metricName': 'CPUUtilization',
+			'metricType': 'Average',
+			'unit': 'Percent',
+			'unitLabel': '',
+			'range': [null, null]
+		}
 	];
 
 getConfig('development').then(function(c){
@@ -126,7 +137,7 @@ function getNewData(timeRangeMinutes, interval){
 	}).then(function(next){
 		// load balancer metrics
 		var endTime = new Date();
-		when.all(metrics.map(function(cloudMetric){
+		when.all(ELBMetrics.map(function(cloudMetric){
 			var d = when.defer(),
 				statistic = {};
 			statistic[cloudMetric.metricType] = '1';
@@ -150,10 +161,37 @@ function getNewData(timeRangeMinutes, interval){
 				d.resolve();
 			});
 			return d.promise;
-		})).then(function(){
-			p.resolve(cloudData);
-		});
-	});
+		})).then(next);
+	}).then(function(next){
+		// ec2 metrics
+		var endTime = new Date();
+		when.all(EC2Metrics.map(function(cloudMetric){
+			var d = when.defer(),
+				statistic = {};
+			statistic[cloudMetric.metricType] = '1';
+			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
+				interval*60, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit, {}
+				).then(function(data){
+					var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
+						name = cloudMetric.namespace+' '+cloudMetric.metricName;
+					cloudData[cloudMetric.name] = {
+						'namespace': cloudMetric.namespace,
+						'metricName': cloudMetric.metricName,
+						'datapoints': datapoints,
+						'unitLabel': cloudMetric.unitLabel,
+						'range': cloudMetric.range,
+						'interval': interval,
+						'timeRange': timeRangeMinutes,
+						'metricType': cloudMetric.metricType
+				}
+				d.resolve();
+			});
+			return d.promise;
+		})).then(next);
+	}).then(function(next){
+		// console.log(cloudData.EC2CPUUtilization.datapoints);
+		sendData(cloudData);
+	})
 	return p.promise;
 }
 
