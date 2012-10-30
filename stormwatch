@@ -75,7 +75,7 @@ var aws = require('plata'),
 			'metricType': 'Average',
 			'unit': 'Percent',
 			'unitLabel': '',
-			'range': [null, null]
+			'range': [0, 100]
 		}
 	];
 
