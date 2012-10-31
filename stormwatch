@@ -115,8 +115,8 @@ io.sockets.on('connection', function(socket){
     	var rangeInMinutes = convertToMinutes(data.timeRange),
     		interval = rangeInMinutes/30;
 
-    	defaultRange = rangeInMinutes;
-    	defaultInterval = interval;
+    	// defaultRange = rangeInMinutes;
+    	// defaultInterval = interval;
 
     	getNewData(rangeInMinutes, interval).then(function(newData){
     		socket.emit('newData', newData);
