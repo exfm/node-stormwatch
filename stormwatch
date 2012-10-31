@@ -111,12 +111,9 @@ console.log('Listening on port 3000');
 io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
     socket.emit('newData', cloudData);
-    socket.on('changeParams', function(data){
+    socket.on('requestData', function(data){
     	var rangeInMinutes = convertToMinutes(data.timeRange),
     		interval = rangeInMinutes/30;
-
-    	// defaultRange = rangeInMinutes;
-    	// defaultInterval = interval;
 
     	getNewData(rangeInMinutes, interval).then(function(newData){
     		socket.emit('newData', newData);
@@ -130,10 +127,10 @@ io.sockets.on('disconnect', function(socket){
 
 getNewData(defaultRange, defaultInterval).then(sendData);
 
-setInterval(function(){
-	console.log('refreshing...');
-	getNewData(defaultRange, defaultInterval).then(sendData);
-}, 60000);
+// setInterval(function(){
+// 	console.log('refreshing...');
+// 	getNewData(defaultRange, defaultInterval).then(sendData);
+// }, 60000);
 
 function getNewData(timeRangeMinutes, interval){
 	var p = when.defer(),

@@ -7,7 +7,7 @@
         <script>
             var socket = io.connect('http://localhost:3000'),
                 charts = {},
-                subtitleString;
+                subtitleString, timeRange;
 
             socket.on('newData', function(newData){
                 $("#loading").text('');
@@ -67,12 +67,20 @@
 
             $(document).ready(function(){
                 $("#timeRange").change(function(){
-                    var newRange = $("#timeRange").val();
-                    socket.emit('changeParams', {
-                        'timeRange': newRange
+                    timeRange = $("#timeRange").val();
+                    socket.emit('requestData', {
+                        'timeRange': timeRange
                     });
                     $("#loading").text('loading...');
                 })
+
+                setInterval(function(){
+                    timeRange = $("#timeRange").val();
+                    socket.emit('requestData', {
+                        'timeRange': timeRange
+                    });
+                    $("#loading").text('loading...');
+                }, 60000);
             })
 
         </script>
