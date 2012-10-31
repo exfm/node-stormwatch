@@ -172,9 +172,10 @@ function getNewData(timeRangeMinutes, interval){
 					statistic = {};
 				statistic[cloudMetric.metricType] = '1';
 				aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
-					interval*60, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit, {
-					}
-					).then(function(data){
+					interval*60, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit,
+					{
+						'InstanceId': instanceIds
+					}).then(function(data){
 						var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
 							name = cloudMetric.namespace+' '+cloudMetric.metricName;
 						cloudData[cloudMetric.name] = {
