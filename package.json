@@ -19,7 +19,8 @@
     "plata": "git://github.com/grmnygrmny/node-plata.git",
     "sequence": "2.2.1",
     "socket.io": "0.9.10",
-    "nconf": "0.6.4"
+    "nconf": "0.6.4",
+    "handlebars": "1.0.7"
   },
   "devDependencies": {},
   "optionalDependencies": {},

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>StormWatch</title>
+
+        <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+        <style>
+            body {
+                padding-top: 60px;
+            }
+        </style>
+        <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+        <script>
+            var socket = io.connect('http://localhost:3000'),
+                charts = {},
+                subtitleString, timeRange;
+
+            socket.on('newData', function(newData){
+                $("#loading").text('');
+                for (metricName in newData) {
+                    dataArray = [];
+                    subtitleString = newData[metricName].metricType+
+                    ', past '+$("#timeRange").val();
+                    newData[metricName].datapoints.forEach(function(pnt){
+                        var date = new Date(pnt.timestamp);
+                        dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
+                    });
+                    charts[metricName] = new Highcharts.Chart({
+                        chart: {
+                            renderTo: metricName,
+                            type: 'spline',
+                            inverted: false,
+                            width: 500,
+                            style: {
+                                padding: '0 0 0 175px',
+                                margin: '0 auto'
+                            }
+                        },
+                        title: {
+                            text: newData[metricName].prefix+' '+newData[metricName].metricName
+                        },
+                        subtitle: {
+                            text: subtitleString
+                        },
+                        xAxis: {
+                            type: 'datetime',
+                            title: {
+                                enabled: true,
+                                text: 'Time'
+                            }
+                        },
+                        yAxis: {
+                            title: {
+                                text: newData[metricName].metricName
+                            },
+                            labels: {
+                                formatter: function() {
+                                    return this.value + newData[metricName].unitLabel;
+                                }
+                            },
+                            min: newData[metricName].range[0],
+                            max: newData[metricName].range[1]
+                        },
+                        legend: {
+                            enabled: false
+                        },
+                        series: [{
+                            data: dataArray
+                        }]
+                    });
+                }
+            });
+
+            $(document).ready(function(){
+                $("#timeRange").change(function(){
+                    requestData('{{view}}');
+                })
+                requestData('{{view}}');
+                setInterval(function(){
+                    requestData('{{view}}');
+                }, 60000);
+            })
+
+            function requestData(view) {
+                timeRange = $("#timeRange").val();
+                socket.emit('requestData', {
+                    'timeRange': timeRange,
+                    'view': view
+                });
+                $("#loading").text('loading...');
+            }
+
+        </script>
+        <script src="/static/bootstrap/js/bootstrap-transition.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-alert.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-modal.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-dropdown.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-scrollspy.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-tab.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-tooltip.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-popover.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-button.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-collapse.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-carousel.js"></script>
+        <script src="/static/bootstrap/js/bootstrap-typeahead.js"></script>
+    </head>
+    <body>
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="/">StormWatch</a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav">
+                        <li class="{{basic_li}}"><a href="/">Basic</a></li>
+                        <li class="{{detailed_li}}"><a href="/detailed">Detailed</a></li>
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span2 affix">
+                    <h1>StormWatch</h1>
+                    time range: 
+                    <select id="timeRange">
+                        <option value="30m">30m</option>
+                        <option value="1h">1h</option>
+                        <option value="2h">2h</option>
+                        <option value="4h">4h</option>
+                        <option value="12h">12h</option>
+                        <option value="1d">1d</option>
+                        <option value="7d">7d</option>
+                    </select>
+                    <span id="loading"></span>
+                </div>
+                <div class="span10">
+                    <div id="ELBLatency" style="height: 400px"></div>​
+                    <div id="ELBRequestCount" style="height: 400px"></div>​
+                    <div id="ELBHealthyHostCount" style="height: 400px"></div>​
+                    <div id="EC2CPUUtilization" style="height: 400px"></div>
+                    <!--         <div id="ELBUnhealthyHostCount" style="height: 400px"></div>​
+                    <div id="ELBServerErrors" style="height: 400px"></div>​ -->
+                </div>
+            </div>
+        </div> <!-- /container -->
+    </body>
+</html>
