@@ -9,113 +9,51 @@ var aws = require('plata'),
 	getConfig = require('junto'),
 	express = require('express'),
 	fs = require('fs'),
-	app = express(),
+	nconf = require('nconf');
+
+var app = express(),
 	server = require('http').createServer(app),
-	io = require('socket.io').listen(server),
-	config,
+	io = require('socket.io').listen(server);
+
+nconf.file({'file': 'config.json'});
+
+var	config,
 	sockets = {},
 	cloudData = {},
-	ELBMetrics = [
-		{
-			'name': 'ELBLatency',
-			'namespace': 'AWS/ELB',
-			'prefix': 'Prod ELB',
-			'metricName': 'Latency',
-			'metricType': 'Average',
-			'unit': 'Seconds',
-			'unitLabel': 's',
-			'range': [0, 10],
-			'loadBalancerName': 'production'
-		},
-		{
-			'name': 'ELBRequestCount',
-			'namespace': 'AWS/ELB',
-			'prefix': 'Prod ELB',
-			'metricName': 'RequestCount',
-			'metricType': 'Sum',
-			'unit': 'Count',
-			'unitLabel': '',
-			'range': [null, null],
-			'loadBalancerName': 'production'
-		},
-		{
-			'name': 'ELBHealthyHostCount',
-			'namespace': 'AWS/ELB',
-			'prefix': 'Prod ELB',
-			'metricName': 'HealthyHostCount',
-			'metricType': 'Average',
-			'unit': 'Count',
-			'unitLabel': '',
-			'range': [0, 10],
-			'loadBalancerName': 'production'
-		}
-		// {
-		// 	'name': 'ELBUnhealthyHostCount',
-		// 	'namespace': 'AWS/ELB',
-		// 	'metricName': 'UnhealthyHostCount',
-		// 	'metricType': 'Average',
-		// 	'unit': 'Count',
-		// 	'unitLabel': '',
-		// 	'range': [null, null],
-		// 	'loadBalancerName': 'production'
-		// },
-		// {
-		// 	'name': 'ELBServerErrors',
-		// 	'namespace': 'AWS/ELB',
-		// 	'metricName': 'HTTPCode_ELB_5XX',
-		// 	'metricType': 'Sum',
-		// 	'unit': 'Count',
-		// 	'unitLabel': '',
-		// 	'range': [null, null],
-		// 	'loadBalancerName': 'production'
-		// }
-	],
-	EC2Metrics = [
-		{
-			'name': 'EC2CPUUtilization',
-			'namespace': 'AWS/EC2',
-			'prefix': 'Prod App',
-			'metricName': 'CPUUtilization',
-			'metricType': 'Average',
-			'unit': 'Percent',
-			'unitLabel': '',
-			'range': [0, 100]
-		}
-	],
 	defaultRange = 30,
-	defaultInterval = 1;
+	defaultInterval = 1,
+	ELBMetrics = nconf.get('ELBMetrics'),
+	EC2Metrics = nconf.get('EC2Metrics'),
+	CustomMetrics = nconf.get('CustomMetrics'),
+	Basic = nconf.get('Basic'),
+	Detailed = nconf.get('Detailed');
 
 getConfig('development').then(function(c){
 	config = c;
 	aws.connect(config.aws);
 });
 
+app.use(express.bodyParser());
+
 app.get('/', function(req, res){
 	res.sendfile(__dirname + '/index.html');
 });
 
 app.get('/info', function(req, res){
-	getNewData(30, 1).then(function(data){
-		var datapoints = data.ELBLatency.datapoints;
-		res.json({
-			'latency': datapoints[datapoints.length-1].value
-		})
-	});
-	
+
+	// this is a hook for bob
+
 });
 
 server.listen(3000);
 console.log('Listening on port 3000');
 
-
 io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
-    socket.emit('newData', cloudData);
     socket.on('requestData', function(data){
     	var rangeInMinutes = convertToMinutes(data.timeRange),
     		interval = rangeInMinutes/30;
-
-    	getNewData(rangeInMinutes, interval).then(function(newData){
+    	getNewData(rangeInMinutes, interval, data.view).then(function(newData){
     		socket.emit('newData', newData);
     	});
     })
@@ -125,16 +63,14 @@ io.sockets.on('disconnect', function(socket){
     delete sockets[socket.id];
 });
 
-getNewData(defaultRange, defaultInterval).then(sendData);
+// getNewData(defaultRange, defaultInterval).then(sendData);
 
-// setInterval(function(){
-// 	console.log('refreshing...');
-// 	getNewData(defaultRange, defaultInterval).then(sendData);
-// }, 60000);
-
-function getNewData(timeRangeMinutes, interval){
+function getNewData(timeRangeMinutes, interval, view){
 	var p = when.defer(),
 		startTime = new Date(new Date().getTime() - 1000*60*timeRangeMinutes);
+		
+	cloudData = {};
+	
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next){
@@ -145,7 +81,8 @@ function getNewData(timeRangeMinutes, interval){
 				statistic = {};
 			statistic[cloudMetric.metricType] = '1';
 			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
-				interval*60, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit, {
+				interval*60, startTime.toISOString(), endTime.toISOString(), 
+				statistic, cloudMetric.unit, {
 				'LoadBalancerName': cloudMetric.loadBalancerName
 			}).then(function(data){
 				var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
@@ -169,14 +106,19 @@ function getNewData(timeRangeMinutes, interval){
 	}).then(function(next){
 		// ec2 metrics
 		aws.ec2.describeInstances().then(function(instanceData){
-			var instanceIds = findInstanceIdsByNameTag(instanceData.xml.reservationSet);
-			var endTime = new Date();
+			var instanceIds = findInstanceIdsByNameTag(instanceData.xml.reservationSet),
+				instanceStatus = getInstanceStatus(instanceData.xml.reservationSet),
+				endTime = new Date();
+
+			// cloudData.instanceStatus = instanceStatus;
+
 			when.all(EC2Metrics.map(function(cloudMetric){
 				var d = when.defer(),
 					statistic = {};
 				statistic[cloudMetric.metricType] = '1';
 				aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
-					interval*60, startTime.toISOString(), endTime.toISOString(), statistic, cloudMetric.unit,
+					interval*60, startTime.toISOString(), endTime.toISOString(), 
+					statistic, cloudMetric.unit,
 					{
 						'InstanceId': instanceIds
 					}).then(function(data){
@@ -199,18 +141,46 @@ function getNewData(timeRangeMinutes, interval){
 			})).then(next);
 		});
 	}).then(function(next){
-		// console.log(cloudData.EC2CPUUtilization.datapoints);
-		sendData(cloudData);
-	})
+		// weatherman metrics
+		// var endTime = new Date();
+		// when.all(CustomMetrics.map(function(cloudMetric){
+		// 	var d = when.defer(),
+		// 		statistic = {};
+		// 	statistic[cloudMetric.metricType] = '1';
+		// 	aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
+		// 		interval*60, startTime.toISOString(), endTime.toISOString(), 
+		// 		statistic, cloudMetric.unit, {}).then(function(data){
+		// 		var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
+		// 			name = cloudMetric.namespace+' '+cloudMetric.metricName;
+		// 		cloudData[cloudMetric.name] = {
+		// 			'namespace': cloudMetric.namespace,
+		// 			'metricName': cloudMetric.metricName,
+		// 			'prefix': cloudMetric.prefix,
+		// 			'datapoints': datapoints,
+		// 			'unitLabel': cloudMetric.unitLabel,
+		// 			'range': cloudMetric.range,
+		// 			'loadBalancerName': cloudMetric.loadBalancerName,
+		// 			'interval': interval,
+		// 			'timeRange': timeRangeMinutes,
+		// 			'metricType': cloudMetric.metricType
+		// 		}
+		// 		d.resolve();
+		// 	});
+		// 	return d.promise;
+		// })).then(next);
+		next();
+	}).then(function(next){
+		p.resolve(cloudData);
+	});
 	return p.promise;
 }
 
-function sendData(data) {
-	console.log('sending data');
-	for (var socket in sockets) {
-		sockets[socket].emit('newData', data);
-	}
-}
+// function sendData(data) {
+// 	console.log('sending data');
+// 	for (var socket in sockets) {
+// 		sockets[socket].emit('newData', data);
+// 	}
+// }
 
 function formatData(data){
 	var asc = data.datapoints.sort(function(a,b){
@@ -254,4 +224,19 @@ function findInstanceIdsByNameTag(instances, nameTag) {
 		});
 	});
 	return instanceIds;
+}
+
+function getInstanceStatus(instances) {
+	var instanceStatus = {},
+		tags = [];
+	instances.forEach(function(instance){
+		tags = instance.instancesSet[0].tagSet;
+		tags.forEach(function(tag){
+			if (tag.key == 'Name' && tag.value.indexOf('App') !== -1) {
+				instanceStatus[tag.value] = instance.instancesSet[0]
+					.instanceState.name;
+			}
+		});
+	});
+	return instanceStatus;
 }

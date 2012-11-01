@@ -18,7 +18,8 @@
     "junto": "git+ssh://git@github.com/exfm/node-junto.git",
     "plata": "git://github.com/grmnygrmny/node-plata.git",
     "sequence": "2.2.1",
-    "socket.tio": "0.9.10"
+    "socket.io": "0.9.10",
+    "nconf": "0.6.4"
   },
   "devDependencies": {},
   "optionalDependencies": {},

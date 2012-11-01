@@ -1,0 +1,77 @@
+{
+	"ELBMetrics": [
+		{
+			"name": "ELBLatency",
+			"namespace": "AWS/ELB",
+			"prefix": "Prod ELB",
+			"metricName": "Latency",
+			"metricType": "Average",
+			"unit": "Seconds",
+			"unitLabel": "s",
+			"range": [0, 10],
+			"loadBalancerName": "production"
+		},
+		{
+			"name": "ELBRequestCount",
+			"namespace": "AWS/ELB",
+			"prefix": "Prod ELB",
+			"metricName": "RequestCount",
+			"metricType": "Sum",
+			"unit": "Count",
+			"unitLabel": "",
+			"range": [null, null],
+			"loadBalancerName": "production"
+		},
+		{
+			"name": "ELBHealthyHostCount",
+			"namespace": "AWS/ELB",
+			"prefix": "Prod ELB",
+			"metricName": "HealthyHostCount",
+			"metricType": "Average",
+			"unit": "Count",
+			"unitLabel": "",
+			"range": [0, 10],
+			"loadBalancerName": "production"
+		}
+	],
+	"EC2Metrics": [
+		{
+			"name": "EC2CPUUtilization",
+			"namespace": "AWS/EC2",
+			"prefix": "Prod App",
+			"metricName": "CPUUtilization",
+			"metricType": "Average",
+			"unit": "Percent",
+			"unitLabel": "",
+			"range": [0, 100]
+		}
+	],
+	"CustomMetrics": [
+		{
+			"name": "AlbumArtFreeMemory",
+			"namespace": "EXFM/AA",
+			"prefix": "Album Art",
+			"metricName": "FreeMemory",
+			"metricType": "Average",
+			"unit": "Mb",
+			"unitLabel": "Mb",
+			"range": [null, null]
+		},
+		{
+			"name": "AlbumArtAvgLoad",
+			"namespace": "EXFM/AA",
+			"prefix": "Album Art",
+			"metricName": "AverageLoad",
+			"metricType": "Average",
+			"unit": "Percent",
+			"unitLabel": "",
+			"range": [null, null]
+		}
+	],
+	"Basic": [
+		"ELBLatency",
+		"ELBRequestCount",
+		"ELBHealthyHostCount",
+		"EC2CPUUtilization"
+	]
+}

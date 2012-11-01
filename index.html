@@ -67,21 +67,23 @@
 
             $(document).ready(function(){
                 $("#timeRange").change(function(){
-                    timeRange = $("#timeRange").val();
-                    socket.emit('requestData', {
-                        'timeRange': timeRange
-                    });
-                    $("#loading").text('loading...');
+                    requestData('basic');
                 })
 
+                requestData('basic');
                 setInterval(function(){
-                    timeRange = $("#timeRange").val();
-                    socket.emit('requestData', {
-                        'timeRange': timeRange
-                    });
-                    $("#loading").text('loading...');
+                    requestData('basic');
                 }, 60000);
             })
+
+            function requestData(view) {
+                timeRange = $("#timeRange").val();
+                socket.emit('requestData', {
+                    'timeRange': timeRange,
+                    'view': view
+                });
+                $("#loading").text('loading...');
+            }
 
         </script>
 
