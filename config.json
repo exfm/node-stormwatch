@@ -9,7 +9,9 @@
 			"unit": "Seconds",
 			"unitLabel": "s",
 			"range": [0, 10],
-			"loadBalancerName": "production"
+			"dimensions": {
+				"LoadBalancerName": "production"
+			}
 		},
 		{
 			"name": "ELBRequestCount",
@@ -20,7 +22,9 @@
 			"unit": "Count",
 			"unitLabel": "",
 			"range": [null, null],
-			"loadBalancerName": "production"
+			"dimensions": {
+				"LoadBalancerName": "production"
+			}
 		},
 		{
 			"name": "ELBHealthyHostCount",
@@ -31,7 +35,9 @@
 			"unit": "Count",
 			"unitLabel": "",
 			"range": [0, 10],
-			"loadBalancerName": "production"
+			"dimensions": {
+				"LoadBalancerName": "production"
+			}
 		}
 	],
 	"EC2Metrics": [

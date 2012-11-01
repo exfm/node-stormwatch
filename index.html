@@ -13,7 +13,8 @@
                 $("#loading").text('');
                 for (metricName in newData) {
                     dataArray = [];
-                    subtitleString = newData[metricName].metricType+', past '+$("#timeRange").val();
+                    subtitleString = newData[metricName].metricType+
+                    ', past '+$("#timeRange").val();
                     newData[metricName].datapoints.forEach(function(pnt){
                         var date = new Date(pnt.timestamp);
                         dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
