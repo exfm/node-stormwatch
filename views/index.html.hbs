@@ -157,12 +157,9 @@
                     <span id="loading"></span>
                 </div>
                 <div class="span10">
-                    <div id="ELBLatency" style="height: 400px"></div>​
-                    <div id="ELBRequestCount" style="height: 400px"></div>​
-                    <div id="ELBHealthyHostCount" style="height: 400px"></div>​
-                    <div id="EC2CPUUtilization" style="height: 400px"></div>
-                    <!--         <div id="ELBUnhealthyHostCount" style="height: 400px"></div>​
-                    <div id="ELBServerErrors" style="height: 400px"></div>​ -->
+                    {{#each metric_list}}
+                        <div id="{{this}}" style="height: 400px"></div>​
+                    {{/each}}
                 </div>
             </div>
         </div> <!-- /container -->

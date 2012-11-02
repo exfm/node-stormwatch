@@ -41,6 +41,7 @@ app.get('/', function(req, res){
 		var template = hbs.compile(data);
 		res.send(template({
 			'view': 'basic',
+			'metric_list': Basic,
 			'basic_li': 'active',
 			'advanced_li': ''
 		}));
@@ -52,6 +53,7 @@ app.get('/detailed', function(req, res){
 		var template = hbs.compile(data);
 		res.send(template({
 			'view': 'detailed',
+			'metric_list': Detailed,
 			'basic_li': '',
 			'detailed_li': 'active'
 		}));
@@ -83,44 +85,49 @@ function getNewData(timeRangeMinutes, interval, view){
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next){
-		aws.ec2.describeInstances().then(function(instanceData){
-			var instanceIds = findInstanceIdsByNameTag(instanceData.xml.reservationSet),
-				instanceStatus = getInstanceStatus(instanceData.xml.reservationSet),
-				endTime = new Date();
-			when.all(Metrics.map(function(cloudMetric){
-				var d = when.defer(),
-					statistic = {},
-					dimensions = {};
-				if (cloudMetric.namespace === 'AWS/ELB') {
-					dimensions = cloudMetric.dimensions;
+		if (view === 'detailed') return aws.ec2.describeInstances().then(next);
+		return next();
+	}).then(function(next, instanceData){
+		var instanceIds,
+			instanceStatus,
+			endTime = new Date();
+		if (view === 'detailed') {
+			instanceIds = findInstanceIdsByNameTag(instanceData.xml.reservationSet);
+			instanceStatus = getInstanceStatus(instanceData.xml.reservationSet);
+		}
+		when.all(Metrics.map(function(cloudMetric){
+			var d = when.defer(),
+				statistic = {},
+				dimensions = {};
+			if (cloudMetric.namespace === 'AWS/ELB') {
+				dimensions = cloudMetric.dimensions;
+			}
+			else if (cloudMetric.namespace === 'AWS/EC2') {
+				dimensions = {
+					'InstanceId': instanceIds
 				}
-				else if (cloudMetric.namespace === 'AWS/EC2') {
-					dimensions = {
-						'InstanceId': instanceIds
-					}
+			}
+			statistic[cloudMetric.metricType] = '1';
+			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
+				interval*60, startTime.toISOString(), endTime.toISOString(), 
+				statistic, cloudMetric.unit, dimensions).then(function(data){
+					var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
+						name = cloudMetric.namespace+' '+cloudMetric.metricName;
+					cloudData[cloudMetric.name] = {
+						'namespace': cloudMetric.namespace,
+						'metricName': cloudMetric.metricName,
+						'prefix': cloudMetric.prefix,
+						'datapoints': datapoints,
+						'unitLabel': cloudMetric.unitLabel,
+						'range': cloudMetric.range,
+						'interval': interval,
+						'timeRange': timeRangeMinutes,
+						'metricType': cloudMetric.metricType
 				}
-				statistic[cloudMetric.metricType] = '1';
-				aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
-					interval*60, startTime.toISOString(), endTime.toISOString(), 
-					statistic, cloudMetric.unit, dimensions).then(function(data){
-						var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
-							name = cloudMetric.namespace+' '+cloudMetric.metricName;
-						cloudData[cloudMetric.name] = {
-							'namespace': cloudMetric.namespace,
-							'metricName': cloudMetric.metricName,
-							'prefix': cloudMetric.prefix,
-							'datapoints': datapoints,
-							'unitLabel': cloudMetric.unitLabel,
-							'range': cloudMetric.range,
-							'interval': interval,
-							'timeRange': timeRangeMinutes,
-							'metricType': cloudMetric.metricType
-					}
-					d.resolve();
-				});
-				return d.promise;
-			})).then(next);
-		});
+				d.resolve();
+			});
+			return d.promise;
+		})).then(next);
 	}).then(function(next){
 		p.resolve(cloudData);
 	});
@@ -196,6 +203,18 @@ function splitMetricsForView(view) {
 		});
 		EC2Metrics.forEach(function(m){
 			if (Basic.indexOf(m.name) > -1) {
+				metrics.push(m)
+			}
+		});
+	}
+	else if (view === 'detailed') {
+		ELBMetrics.forEach(function(m){
+			if (Detailed.indexOf(m.name) > -1) {
+				metrics.push(m)
+			}
+		});
+		EC2Metrics.forEach(function(m){
+			if (Detailed.indexOf(m.name) > -1) {
 				metrics.push(m)
 			}
 		});
