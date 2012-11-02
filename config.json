@@ -41,22 +41,13 @@
 		}
 	],
 	"EC2Metrics": [
-		{
-			"name": "EC2CPUUtilization",
-			"namespace": "AWS/EC2",
-			"prefix": "Prod App",
-			"metricName": "CPUUtilization",
-			"metricType": "Average",
-			"unit": "Percent",
-			"unitLabel": "",
-			"range": [0, 100]
-		}
+
 	],
 	"CustomMetrics": [
 		{
 			"name": "TestLoadAvg",
-			"namespace": "TestService",
-			"prefix": "{test}",
+			"namespace": "DrewDev",
+			"prefix": "DrewDev",
 			"metricName": "LoadAvg",
 			"metricType": "Average",
 			"unit": "Percent",
@@ -65,8 +56,8 @@
 		},
 		{
 			"name": "TestFreeMemPercent",
-			"namespace": "TestService",
-			"prefix": "{test}",
+			"namespace": "DrewDev",
+			"prefix": "DrewDev",
 			"metricName": "FreeMemPercent",
 			"metricType": "Average",
 			"unit": "Percent",

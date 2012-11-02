@@ -84,33 +84,16 @@ function getNewData(timeRangeMinutes, interval, view){
 	var Metrics = splitMetricsForView(view);
 	sequence().then(function(next){
 		aws.onConnected(next);
-	}).then(function(next){
-		if (view === 'detailed') return aws.ec2.describeInstances().then(next);
-		return next();
 	}).then(function(next, instanceData){
-		var instanceIds,
-			instanceStatus,
-			endTime = new Date();
-		if (view === 'detailed') {
-			instanceIds = findInstanceIdsByNameTag(instanceData.xml.reservationSet);
-			instanceStatus = getInstanceStatus(instanceData.xml.reservationSet);
-		}
+		var	endTime = new Date();
 		when.all(Metrics.map(function(cloudMetric){
 			var d = when.defer(),
 				statistic = {},
 				dimensions = {};
-			if (cloudMetric.namespace === 'AWS/ELB') {
-				dimensions = cloudMetric.dimensions;
-			}
-			else if (cloudMetric.namespace === 'AWS/EC2') {
-				dimensions = {
-					'InstanceId': instanceIds
-				}
-			}
 			statistic[cloudMetric.metricType] = '1';
 			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
 				interval*60, startTime.toISOString(), endTime.toISOString(), 
-				statistic, cloudMetric.unit, dimensions).then(function(data){
+				statistic, cloudMetric.unit, cloudMetric.dimensions).then(function(data){
 					var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
 						name = cloudMetric.namespace+' '+cloudMetric.metricName;
 					cloudData[cloudMetric.name] = {
