@@ -45,8 +45,38 @@
 	],
 	"CustomMetrics": [
 		{
-			"name": "TestLoadAvg",
-			"namespace": "DrewDev",
+			"name": "RabbitCeleryQueue",
+			"namespace": "SW/Rabbit",
+			"prefix": "Rabbit",
+			"metricName": "CeleryQueue",
+			"metricType": "Average",
+			"unit": "Count",
+			"unitLabel": "",
+			"range": [0, null]
+		},
+		{
+			"name": "RabbitMetadataQueue",
+			"namespace": "SW/Rabbit",
+			"prefix": "Rabbit",
+			"metricName": "MetadataQueue",
+			"metricType": "Average",
+			"unit": "Count",
+			"unitLabel": "",
+			"range": [0, null]
+		},
+		{
+			"name": "RabbitPhantomQueue",
+			"namespace": "SW/Rabbit",
+			"prefix": "Rabbit",
+			"metricName": "PhantomQueue",
+			"metricType": "Average",
+			"unit": "Count",
+			"unitLabel": "",
+			"range": [0, null]
+		},
+		{
+			"name": "DrewDevLoadAvg",
+			"namespace": "SW/DrewDev",
 			"prefix": "DrewDev",
 			"metricName": "LoadAvg",
 			"metricType": "Average",
@@ -55,8 +85,8 @@
 			"range": [0, 100]
 		},
 		{
-			"name": "TestFreeMemPercent",
-			"namespace": "DrewDev",
+			"name": "DrewDevFreeMemPercent",
+			"namespace": "SW/DrewDev",
 			"prefix": "DrewDev",
 			"metricName": "FreeMemPercent",
 			"metricType": "Average",
@@ -71,8 +101,10 @@
 		"ELBHealthyHostCount"
 	],
 	"Detailed": [
-		"EC2CPUUtilization",
-		"TestLoadAvg",
-		"TestFreeMemPercent"
+		"RabbitCeleryQueue",
+		"RabbitMetadataQueue",
+		"RabbitPhantomQueue",
+		"DrewDevLoadAvg",
+		"DrewDevFreeMemPercent"
 	]
 }
