@@ -54,24 +54,24 @@
 	],
 	"CustomMetrics": [
 		{
-			"name": "AlbumArtFreeMemory",
-			"namespace": "EXFM/AA",
-			"prefix": "Album Art",
-			"metricName": "FreeMemory",
-			"metricType": "Average",
-			"unit": "Mb",
-			"unitLabel": "Mb",
-			"range": [null, null]
-		},
-		{
-			"name": "AlbumArtAvgLoad",
-			"namespace": "EXFM/AA",
-			"prefix": "Album Art",
-			"metricName": "AverageLoad",
+			"name": "TestLoadAvg",
+			"namespace": "TestService",
+			"prefix": "{test}",
+			"metricName": "LoadAvg",
 			"metricType": "Average",
 			"unit": "Percent",
 			"unitLabel": "",
-			"range": [null, null]
+			"range": [0, 100]
+		},
+		{
+			"name": "TestFreeMemPercent",
+			"namespace": "TestService",
+			"prefix": "{test}",
+			"metricName": "FreeMemPercent",
+			"metricType": "Average",
+			"unit": "Percent",
+			"unitLabel": "",
+			"range": [0, 100]
 		}
 	],
 	"Basic": [
@@ -80,6 +80,8 @@
 		"ELBHealthyHostCount"
 	],
 	"Detailed": [
-		"EC2CPUUtilization"
+		"EC2CPUUtilization",
+		"TestLoadAvg",
+		"TestFreeMemPercent"
 	]
 }

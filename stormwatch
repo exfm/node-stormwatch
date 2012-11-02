@@ -194,26 +194,17 @@ function getInstanceStatus(instances) {
 }
 
 function splitMetricsForView(view) {
-	var metrics = [];
+	var metrics = [],
+		combinedMetrics = ELBMetrics.concat(EC2Metrics).concat(CustomMetrics);
 	if (view === 'basic') {
-		ELBMetrics.forEach(function(m){
-			if (Basic.indexOf(m.name) > -1) {
-				metrics.push(m)
-			}
-		});
-		EC2Metrics.forEach(function(m){
+		combinedMetrics.forEach(function(m){
 			if (Basic.indexOf(m.name) > -1) {
 				metrics.push(m)
 			}
 		});
 	}
 	else if (view === 'detailed') {
-		ELBMetrics.forEach(function(m){
-			if (Detailed.indexOf(m.name) > -1) {
-				metrics.push(m)
-			}
-		});
-		EC2Metrics.forEach(function(m){
+		combinedMetrics.forEach(function(m){
 			if (Detailed.indexOf(m.name) > -1) {
 				metrics.push(m)
 			}
