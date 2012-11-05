@@ -45,7 +45,7 @@ app.get('/', function(req, res){
 			'basic_li': 'active',
 			'advanced_li': ''
 		}));
-	})
+	});
 });
 
 app.get('/detailed', function(req, res){
@@ -57,7 +57,7 @@ app.get('/detailed', function(req, res){
 			'basic_li': '',
 			'detailed_li': 'active'
 		}));
-	})
+	});
 });
 
 app.get('/info', function(req, res){
@@ -91,8 +91,8 @@ function getNewData(timeRangeMinutes, interval, view){
 				statistic = {},
 				dimensions = {};
 			statistic[cloudMetric.metricType] = '1';
-			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName, 
-				interval*60, startTime.toISOString(), endTime.toISOString(), 
+			aws.cloudWatch.getMetricStatistics(cloudMetric.namespace, cloudMetric.metricName,
+				interval*60, startTime.toISOString(), endTime.toISOString(),
 				statistic, cloudMetric.unit, cloudMetric.dimensions).then(function(data){
 					var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
 						name = cloudMetric.namespace+' '+cloudMetric.metricName;

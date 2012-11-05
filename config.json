@@ -93,6 +93,16 @@
 			"unit": "Percent",
 			"unitLabel": "",
 			"range": [0, 100]
+		},
+		{
+			"name": "ListeningCount",
+			"namespace": "SW/Exfm",
+			"prefix": "Exfm",
+			"metricName": "ListeningCount",
+			"metricType": "Average",
+			"unit": "Count",
+			"unitLabel": "",
+			"range": [0, null]
 		}
 	],
 	"Basic": [
@@ -105,6 +115,7 @@
 		"RabbitMetadataQueue",
 		"RabbitPhantomQueue",
 		"DrewDevLoadAvg",
-		"DrewDevFreeMemPercent"
+		"DrewDevFreeMemPercent",
+		"ListeningCount"
 	]
 }
