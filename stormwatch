@@ -26,7 +26,8 @@ var	config,
 	EC2Metrics = nconf.get('EC2Metrics'),
 	CustomMetrics = nconf.get('CustomMetrics'),
 	Basic = nconf.get('Basic'),
-	Detailed = nconf.get('Detailed');
+	Detailed = nconf.get('Detailed'),
+	BasicStats = nconf.get('BasicStats');
 
 getConfig('development').then(function(c){
 	config = c;
@@ -71,13 +72,17 @@ io.sockets.on('connection', function(socket){
     socket.on('requestData', function(data){
 		var rangeInMinutes = convertToMinutes(data.timeRange),
 			interval = rangeInMinutes/30;
-		getNewData(rangeInMinutes, interval, data.view).then(function(newData){
-			socket.emit('newData', newData);
+		getBasicStatsData().then(function(newData){
+			socket.emit('newBasicStatsData', newData);
 		});
+		getCloudWatchData(rangeInMinutes, interval, data.view).then(function(newData){
+			socket.emit('newCloudWatchData', newData);
+		});
+
 	});
 });
 
-function getNewData(timeRangeMinutes, interval, view){
+function getCloudWatchData(timeRangeMinutes, interval, view){
 	var p = when.defer(),
 		startTime = new Date(new Date().getTime() - 1000*60*timeRangeMinutes),
 		Metrics = splitMetricsForView(view);
@@ -115,6 +120,28 @@ function getNewData(timeRangeMinutes, interval, view){
 		})).then(next);
 	}).then(function(next){
 		p.resolve(cloudData);
+	});
+	return p.promise;
+}
+
+function getBasicStatsData(){
+	var p = when.defer(),
+		basicStatsData = {};
+	when.all(BasicStats.map(function(stat){
+		var d = when.defer();
+		basicStatsData[stat.name] = {};
+		request
+			.get(stat.url)
+			.end(function(res){
+				Object.keys(stat.stats).map(function(key){
+					basicStatsData[stat.name][key] = getProperty(res.body, stat.stats[key]);
+				});
+
+				d.resolve();
+			});
+		return d.promise;
+	})).then(function(){
+		p.resolve(basicStatsData);
 	});
 	return p.promise;
 }
@@ -196,4 +223,19 @@ function splitMetricsForView(view) {
 		});
 	}
 	return metrics;
+}
+
+function getProperty(obj, prop) {
+    var parts = prop.split('.'),
+        last = parts.pop(),
+        l = parts.length,
+        i = 1,
+        current = parts[0];
+    while((obj = obj[current]) && i < l) {
+        current = parts[i];
+        i++;
+    }
+    if(obj) {
+        return obj[last];
+    }
 }

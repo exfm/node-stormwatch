@@ -31,7 +31,11 @@
                 charts = {},
                 subtitleString, timeRange;
 
-            socket.on('newData', function(newData){
+            String.prototype.toCamel = function(){
+                return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
+            };
+
+            socket.on('newCloudWatchData', function(newData){
                 $("#loading").text('');
                 for (metricName in newData) {
                     dataArray = [];
@@ -86,6 +90,10 @@
                 }
             });
 
+            socket.on('newBasicStatsData', function(newData){
+                insertBasicStatsData(newData);
+            });
+
             $(document).ready(function(){
                 $("#timeRange").change(function(){
                     requestData('{{view}}');
@@ -103,6 +111,27 @@
                     'view': view
                 });
                 $("#loading").text('loading...');
+            }
+
+            function insertBasicStatsData(data) {
+                Object.keys(data).map(function(key){
+                    var keyName = formatStatName(key);
+                    if (!$('#' + keyName).length){
+                        $("#basic_stats").append("<div id='"+keyName+"''>" + key + "</div>");
+                    }
+                    Object.keys(data[key]).map(function(stat){
+                        var statName = formatStatName(key+stat);
+                        if (!$('#' + statName).length){
+                            $('#' + keyName).append("<div id='"+statName+"''>" + stat + ": <span id='" + statName + "Value'></span></div>");
+                        }
+                        $('#' + statName + 'Value').text(data[key][stat]);
+                    })
+                });
+            }
+
+            function formatStatName(name) {
+                name = name.replace(/\s/g, "");
+                return name.charAt(0).toLowerCase() + name.slice(1);
             }
 
         </script>
@@ -140,28 +169,25 @@
             </div>
         </div>
 
-        <div class="container-fluid">
-            <div class="row-fluid">
-                <div class="span2 affix">
-                    <h1>StormWatch</h1>
-                    time range: 
-                    <select id="timeRange">
-                        <option value="30m">30m</option>
-                        <option value="1h">1h</option>
-                        <option value="2h">2h</option>
-                        <option value="4h">4h</option>
-                        <option value="12h">12h</option>
-                        <option value="1d">1d</option>
-                        <option value="7d">7d</option>
-                    </select>
-                    <span id="loading"></span>
-                </div>
-                <div class="span10">
-                    {{#each metric_list}}
-                        <div id="{{this}}" style="height: 400px"></div>​
-                    {{/each}}
-                </div>
+        <div class="container">
+            <h1>StormWatch</h1>
+            time range:
+            <select id="timeRange">
+                <option value="30m">30m</option>
+                <option value="1h">1h</option>
+                <option value="2h">2h</option>
+                <option value="4h">4h</option>
+                <option value="12h">12h</option>
+                <option value="1d">1d</option>
+                <option value="7d">7d</option>
+            </select>
+            <span id="loading"></span>
+            <div id="basic_stats">
+                Basic Stats
             </div>
+            {{#each metric_list}}
+                <div id="{{this}}" style="height: 400px"></div>​
+            {{/each}}
         </div> <!-- /container -->
     </body>
 </html>
