@@ -10,8 +10,7 @@ var aws = require('plata'),
 	express = require('express'),
 	fs = require('fs'),
 	nconf = require('nconf'),
-	hbs = require('handlebars'),
-	wm = require('weatherman');
+	hbs = require('handlebars');
 
 var app = express(),
 	server = require('http').createServer(app),
@@ -33,18 +32,6 @@ getConfig('development').then(function(c){
 	config = c;
 	aws.connect(config.aws);
 });
-
-// start weatherman
-wm.config = {
-    namespace: "SW/DrewDev",
-    plugins: {
-        listening: {
-			namespace: "SW/Exfm",
-			listening_url: "http://ex.fm/api/v3/whos-listening?results=0"
-        }
-    }
-};
-wm.start(300);
 
 app.use(express.bodyParser());
 app.use("/static", express.static(__dirname + "/static"));

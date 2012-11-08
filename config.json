@@ -114,8 +114,6 @@
 		"RabbitCeleryQueue",
 		"RabbitMetadataQueue",
 		"RabbitPhantomQueue",
-		"DrewDevLoadAvg",
-		"DrewDevFreeMemPercent",
 		"ListeningCount"
 	]
 }
