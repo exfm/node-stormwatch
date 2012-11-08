@@ -17,6 +17,11 @@
                 margin: 0 0 0 10px;
             }
 
+            .loading {
+                font-style: bold, italic;
+
+            }
+
         </style>
         <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
         <!--[if lt IE 9]>
@@ -34,14 +39,14 @@
         <script>
             var socket = io.connect('http://localhost:3000'),
                 charts = {},
-                subtitleString, timeRange;
+                subtitleString, timeRange, brandText;
 
             String.prototype.toCamel = function(){
                 return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
             };
 
             socket.on('newCloudWatchData', function(newData){
-                $("#loading").text('');
+                $("#pageName").text(brandText);
                 for (metricName in newData) {
                     dataArray = [];
                     subtitleString = newData[metricName].metricType+
@@ -99,6 +104,7 @@
             });
 
             $(document).ready(function(){
+                brandText = $(".brand").text();
                 $("#timeRange").change(function(){
                     requestData('{{view}}');
                 })
@@ -114,7 +120,7 @@
                     'timeRange': timeRange,
                     'view': view
                 });
-                $("#loading").text('loading...');
+                $("#pageName").text('loading...');
             }
 
             function insertBasicStatsData(data) {
@@ -176,8 +182,7 @@
         <div class="container">
             <div class="pull-right">
                 <div id="header">
-                    <h1>StormWatch</h1>
-                    time range:
+                    <h1 id="pageName">StormWatch</h1>
                     <select id="timeRange">
                         <option value="30m">30m</option>
                         <option value="1h">1h</option>
@@ -187,12 +192,13 @@
                         <option value="1d">1d</option>
                         <option value="7d">7d</option>
                     </select>
-                    <span id="loading"></span>
+                    <div id="loading" class="loading"></div>
                 </div>
                 <div id="basic_stats">
                     <h2>Basic Stats</h2>
                 </div>
             </div>
+
             {{#each metric_list}}
                 <div id="{{this}}" style="height: 400px"></div>​
             {{/each}}
