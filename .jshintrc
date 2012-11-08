@@ -40,6 +40,7 @@
     "noempty": true,
     "nonew": false,
     "nomen": true,
+    "node": true,
     "onevar": true,
     "plusplus": false,
     "trailing": true,

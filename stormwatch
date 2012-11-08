@@ -10,7 +10,8 @@ var aws = require('plata'),
 	express = require('express'),
 	fs = require('fs'),
 	nconf = require('nconf'),
-	hbs = require('handlebars');
+	hbs = require('handlebars'),
+	wm = require('weatherman');
 
 var app = express(),
 	server = require('http').createServer(app),
@@ -32,6 +33,18 @@ getConfig('development').then(function(c){
 	config = c;
 	aws.connect(config.aws);
 });
+
+// start weatherman
+wm.config = {
+    namespace: "SW/DrewDev",
+    plugins: {
+        listening: {
+			namespace: "SW/Exfm",
+			listening_url: "http://ex.fm/api/v3/whos-listening?results=0"
+        }
+    }
+};
+wm.start(300);
 
 app.use(express.bodyParser());
 app.use("/static", express.static(__dirname + "/static"));
@@ -69,19 +82,21 @@ console.log('Listening on port 3000');
 
 io.sockets.on('connection', function(socket){
     socket.on('requestData', function(data){
-    	var rangeInMinutes = convertToMinutes(data.timeRange),
-    		interval = rangeInMinutes/30;
-    	getNewData(rangeInMinutes, interval, data.view).then(function(newData){
-    		socket.emit('newData', newData);
-    	});
-    })
+		var rangeInMinutes = convertToMinutes(data.timeRange),
+			interval = rangeInMinutes/30;
+		getNewData(rangeInMinutes, interval, data.view).then(function(newData){
+			socket.emit('newData', newData);
+		});
+	});
 });
 
 function getNewData(timeRangeMinutes, interval, view){
 	var p = when.defer(),
-		startTime = new Date(new Date().getTime() - 1000*60*timeRangeMinutes);
+		startTime = new Date(new Date().getTime() - 1000*60*timeRangeMinutes),
+		Metrics = splitMetricsForView(view);
+
 	cloudData = {};
-	var Metrics = splitMetricsForView(view);
+
 	sequence().then(function(next){
 		aws.onConnected(next);
 	}).then(function(next, instanceData){
@@ -106,7 +121,7 @@ function getNewData(timeRangeMinutes, interval, view){
 						'interval': interval,
 						'timeRange': timeRangeMinutes,
 						'metricType': cloudMetric.metricType
-				}
+				};
 				d.resolve();
 			});
 			return d.promise;
@@ -129,7 +144,7 @@ function formatData(data){
 		formatted.push({
 			'timestamp': item.timestamp,
 			'value': item.sum || item.average
-		})
+		});
 	});
 	console.log(formatted);
 	return formatted;
@@ -153,7 +168,7 @@ function findInstanceIdsByNameTag(instances, nameTag) {
 	instances.forEach(function(instance){
 		tags = instance.instancesSet[0].tagSet;
 		tags.forEach(function(tag){
-			if (tag.key == 'Name' && tag.value.indexOf('App') !== -1) {
+			if (tag.key === 'Name' && tag.value.indexOf('App') !== -1) {
 				instanceIds.push(instance.instancesSet[0].instanceId);
 			}
 		});
@@ -167,7 +182,7 @@ function getInstanceStatus(instances) {
 	instances.forEach(function(instance){
 		tags = instance.instancesSet[0].tagSet;
 		tags.forEach(function(tag){
-			if (tag.key == 'Name' && tag.value.indexOf('App') !== -1) {
+			if (tag.key === 'Name' && tag.value.indexOf('App') !== -1) {
 				instanceStatus[tag.value] = instance.instancesSet[0]
 					.instanceState.name;
 			}
@@ -182,14 +197,14 @@ function splitMetricsForView(view) {
 	if (view === 'basic') {
 		combinedMetrics.forEach(function(m){
 			if (Basic.indexOf(m.name) > -1) {
-				metrics.push(m)
+				metrics.push(m);
 			}
 		});
 	}
 	else if (view === 'detailed') {
 		combinedMetrics.forEach(function(m){
 			if (Detailed.indexOf(m.name) > -1) {
-				metrics.push(m)
+				metrics.push(m);
 			}
 		});
 	}

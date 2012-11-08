@@ -17,6 +17,7 @@
     "superagent": "0.9.7",
     "junto": "git+ssh://git@github.com/exfm/node-junto.git",
     "plata": "git://github.com/grmnygrmny/node-plata.git",
+    "weatherman": "git://github.com/exfm/node-weatherman.git",
     "sequence": "2.2.1",
     "socket.io": "0.9.10",
     "nconf": "0.6.4",
