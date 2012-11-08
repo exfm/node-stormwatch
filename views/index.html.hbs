@@ -12,6 +12,11 @@
             body {
                 padding-top: 60px;
             }
+
+            .stat {
+                margin: 0 0 0 10px;
+            }
+
         </style>
         <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
         <!--[if lt IE 9]>
@@ -116,12 +121,12 @@
                 Object.keys(data).map(function(key){
                     var keyName = formatStatName(key);
                     if (!$('#' + keyName).length){
-                        $("#basic_stats").append("<div id='"+keyName+"''>" + key + "</div>");
+                        $("#basic_stats").append("<div id='"+keyName+"''><h3>" + key + "</h3></div>");
                     }
                     Object.keys(data[key]).map(function(stat){
                         var statName = formatStatName(key+stat);
                         if (!$('#' + statName).length){
-                            $('#' + keyName).append("<div id='"+statName+"''>" + stat + ": <span id='" + statName + "Value'></span></div>");
+                            $('#' + keyName).append("<div id='"+statName+"'' class='stat'>" + stat + ": <span id='" + statName + "Value'></span></div>");
                         }
                         $('#' + statName + 'Value').text(data[key][stat]);
                     })
@@ -169,20 +174,24 @@
         </div>
 
         <div class="container">
-            <h1>StormWatch</h1>
-            time range:
-            <select id="timeRange">
-                <option value="30m">30m</option>
-                <option value="1h">1h</option>
-                <option value="2h">2h</option>
-                <option value="4h">4h</option>
-                <option value="12h">12h</option>
-                <option value="1d">1d</option>
-                <option value="7d">7d</option>
-            </select>
-            <span id="loading"></span>
-            <div id="basic_stats">
-                Basic Stats
+            <div class="pull-right">
+                <div id="header">
+                    <h1>StormWatch</h1>
+                    time range:
+                    <select id="timeRange">
+                        <option value="30m">30m</option>
+                        <option value="1h">1h</option>
+                        <option value="2h">2h</option>
+                        <option value="4h">4h</option>
+                        <option value="12h">12h</option>
+                        <option value="1d">1d</option>
+                        <option value="7d">7d</option>
+                    </select>
+                    <span id="loading"></span>
+                </div>
+                <div id="basic_stats">
+                    <h2>Basic Stats</h2>
+                </div>
             </div>
             {{#each metric_list}}
                 <div id="{{this}}" style="height: 400px"></div>​

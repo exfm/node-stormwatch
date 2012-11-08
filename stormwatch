@@ -72,13 +72,12 @@ io.sockets.on('connection', function(socket){
     socket.on('requestData', function(data){
 		var rangeInMinutes = convertToMinutes(data.timeRange),
 			interval = rangeInMinutes/30;
-		getBasicStatsData().then(function(newData){
-			socket.emit('newBasicStatsData', newData);
-		});
 		getCloudWatchData(rangeInMinutes, interval, data.view).then(function(newData){
 			socket.emit('newCloudWatchData', newData);
 		});
-
+		getBasicStatsData().then(function(newData){
+			socket.emit('newBasicStatsData', newData);
+		});
 	});
 });
 
