@@ -133,7 +133,17 @@ function getBasicStatsData(){
 			.get(stat.url)
 			.end(function(res){
 				Object.keys(stat.stats).map(function(key){
-					basicStatsData[stat.name][key] = getProperty(res.body, stat.stats[key]);
+					var property = getProperty(res.body, stat.stats[key]);
+					if (key === 'Start' || key === 'End') {
+						if (property === -1) {
+							return basicStatsData[stat.name][key] = 'null';
+						}
+						property = new Date(property);
+						return basicStatsData[stat.name][key] =
+							property.getMonth()+'/'+property.getDate()+'/'+property.getFullYear()+
+							' '+property.getHours()+':'+property.getMinutes()+':'+property.getSeconds();
+					}
+					return basicStatsData[stat.name][key] = property;
 				});
 
 				d.resolve();
