@@ -50,7 +50,7 @@
                 newData.forEach(function(metric){
                     dataArray = [];
                     subtitleString = metric.metricType+
-                    ', past '+$("#timeRange").val();
+                    ', past '+$("#timeRange").val()+' ('+metric.interval+'m interval)';
                     metric.datapoints.forEach(function(pnt){
                         var date = new Date(pnt.timestamp);
                         dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
