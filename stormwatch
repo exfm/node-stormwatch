@@ -86,7 +86,7 @@ function getCloudWatchData(timeRangeMinutes, interval, view){
 		startTime = new Date(new Date().getTime() - 1000*60*timeRangeMinutes),
 		Metrics = splitMetricsForView(view);
 
-	cloudData = {};
+	cloudData = [];
 
 	sequence().then(function(next){
 		aws.onConnected(next);
@@ -102,17 +102,16 @@ function getCloudWatchData(timeRangeMinutes, interval, view){
 				statistic, cloudMetric.unit, cloudMetric.dimensions).then(function(data){
 					var datapoints = formatData(data.getMetricStatisticsResponse.getMetricStatisticsResult),
 						name = cloudMetric.namespace+' '+cloudMetric.metricName;
-					cloudData[cloudMetric.name] = {
+					cloudData.push({
 						'namespace': cloudMetric.namespace,
 						'metricName': cloudMetric.metricName,
-						'prefix': cloudMetric.prefix,
 						'datapoints': datapoints,
 						'unitLabel': cloudMetric.unitLabel,
 						'range': cloudMetric.range,
 						'interval': interval,
 						'timeRange': timeRangeMinutes,
 						'metricType': cloudMetric.metricType
-				};
+				});
 				d.resolve();
 			});
 			return d.promise;
@@ -219,14 +218,14 @@ function splitMetricsForView(view) {
 		combinedMetrics = ELBMetrics.concat(EC2Metrics).concat(CustomMetrics);
 	if (view === 'basic') {
 		combinedMetrics.forEach(function(m){
-			if (Basic.indexOf(m.name) > -1) {
+			if (Basic.indexOf(m.metricName) > -1) {
 				metrics.push(m);
 			}
 		});
 	}
 	else if (view === 'detailed') {
 		combinedMetrics.forEach(function(m){
-			if (Detailed.indexOf(m.name) > -1) {
+			if (Detailed.indexOf(m.metricName) > -1) {
 				metrics.push(m);
 			}
 		});

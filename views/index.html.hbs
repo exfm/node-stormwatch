@@ -47,17 +47,17 @@
 
             socket.on('newCloudWatchData', function(newData){
                 $("#pageName").text(brandText);
-                for (metricName in newData) {
+                newData.forEach(function(metric){
                     dataArray = [];
-                    subtitleString = newData[metricName].metricType+
+                    subtitleString = metric.metricType+
                     ', past '+$("#timeRange").val();
-                    newData[metricName].datapoints.forEach(function(pnt){
+                    metric.datapoints.forEach(function(pnt){
                         var date = new Date(pnt.timestamp);
                         dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
                     });
-                    charts[metricName] = new Highcharts.Chart({
+                    charts[metric.metricName] = new Highcharts.Chart({
                         chart: {
-                            renderTo: metricName,
+                            renderTo: metric.metricName,
                             type: 'spline',
                             inverted: false,
                             width: 500,
@@ -65,7 +65,7 @@
                             }
                         },
                         title: {
-                            text: newData[metricName].prefix+' '+newData[metricName].metricName
+                            text: metric.namespace+' '+metric.metricName
                         },
                         subtitle: {
                             text: subtitleString
@@ -79,15 +79,15 @@
                         },
                         yAxis: {
                             title: {
-                                text: newData[metricName].metricName
+                                text: metric.metricName
                             },
                             labels: {
                                 formatter: function() {
-                                    return this.value + newData[metricName].unitLabel;
+                                    return this.value + metric.unitLabel;
                                 }
                             },
-                            min: newData[metricName].range[0],
-                            max: newData[metricName].range[1]
+                            min: metric.range[0],
+                            max: metric.range[1]
                         },
                         legend: {
                             enabled: false
@@ -96,7 +96,7 @@
                             data: dataArray
                         }]
                     });
-                }
+                });
             });
 
             socket.on('newBasicStatsData', function(newData){

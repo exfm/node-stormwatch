@@ -1,9 +1,7 @@
 {
 	"ELBMetrics": [
 		{
-			"name": "ELBLatency",
 			"namespace": "AWS/ELB",
-			"prefix": "Prod ELB",
 			"metricName": "Latency",
 			"metricType": "Average",
 			"unit": "Seconds",
@@ -14,9 +12,7 @@
 			}
 		},
 		{
-			"name": "ELBRequestCount",
 			"namespace": "AWS/ELB",
-			"prefix": "Prod ELB",
 			"metricName": "RequestCount",
 			"metricType": "Sum",
 			"unit": "Count",
@@ -27,9 +23,7 @@
 			}
 		},
 		{
-			"name": "ELBHealthyHostCount",
 			"namespace": "AWS/ELB",
-			"prefix": "Prod ELB",
 			"metricName": "HealthyHostCount",
 			"metricType": "Average",
 			"unit": "Count",
@@ -45,9 +39,7 @@
 	],
 	"CustomMetrics": [
 		{
-			"name": "RabbitCeleryQueue",
 			"namespace": "SW/Rabbit",
-			"prefix": "Rabbit",
 			"metricName": "CeleryQueue",
 			"metricType": "Average",
 			"unit": "Count",
@@ -55,9 +47,7 @@
 			"range": [0, null]
 		},
 		{
-			"name": "RabbitMetadataQueue",
 			"namespace": "SW/Rabbit",
-			"prefix": "Rabbit",
 			"metricName": "MetadataQueue",
 			"metricType": "Average",
 			"unit": "Count",
@@ -65,9 +55,7 @@
 			"range": [0, null]
 		},
 		{
-			"name": "RabbitPhantomQueue",
 			"namespace": "SW/Rabbit",
-			"prefix": "Rabbit",
 			"metricName": "PhantomQueue",
 			"metricType": "Average",
 			"unit": "Count",
@@ -75,29 +63,7 @@
 			"range": [0, null]
 		},
 		{
-			"name": "DrewDevLoadAvg",
-			"namespace": "SW/DrewDev",
-			"prefix": "DrewDev",
-			"metricName": "LoadAvg",
-			"metricType": "Average",
-			"unit": "Percent",
-			"unitLabel": "",
-			"range": [0, 100]
-		},
-		{
-			"name": "DrewDevFreeMemPercent",
-			"namespace": "SW/DrewDev",
-			"prefix": "DrewDev",
-			"metricName": "FreeMemPercent",
-			"metricType": "Average",
-			"unit": "Percent",
-			"unitLabel": "",
-			"range": [0, 100]
-		},
-		{
-			"name": "ListeningCount",
 			"namespace": "SW/Exfm",
-			"prefix": "Exfm",
 			"metricName": "ListeningCount",
 			"metricType": "Average",
 			"unit": "Count",
@@ -106,14 +72,14 @@
 		}
 	],
 	"Basic": [
-		"ELBLatency",
-		"ELBRequestCount",
-		"ELBHealthyHostCount"
+		"Latency",
+		"RequestCount",
+		"HealthyHostCount"
 	],
 	"Detailed": [
-		"RabbitCeleryQueue",
-		"RabbitMetadataQueue",
-		"RabbitPhantomQueue",
+		"CeleryQueue",
+		"MetadataQueue",
+		"PhantomQueue",
 		"ListeningCount"
 	],
 	"BasicStats": [{
