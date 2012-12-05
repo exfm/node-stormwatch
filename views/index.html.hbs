@@ -39,7 +39,15 @@
         <script>
             var socket = io.connect('http://localhost:3000'),
                 charts = {},
-                subtitleString, timeRange, brandText;
+                subtitleString, timeRange, brandText,
+                datapoints,
+                series = [],
+                thisPeriod = [],
+                previousPeriod = [],
+                i,
+                noIntervalText = ['CeleryQueue',
+                    'MetadataQueue',
+                    'PhantomQueue'];
 
             String.prototype.toCamel = function(){
                 return this.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('-','');});
@@ -48,13 +56,47 @@
             socket.on('newCloudWatchData', function(newData){
                 $("#pageName").text(brandText);
                 newData.forEach(function(metric){
-                    dataArray = [];
+                    series = [];
+                    thisPeriod = [];
+                    previousPeriod = [];
                     subtitleString = metric.metricType+
-                    ', past '+$("#timeRange").val()+' ('+metric.interval+'m interval)';
-                    metric.datapoints.forEach(function(pnt){
-                        var date = new Date(pnt.timestamp);
-                        dataArray.push([date.getTime(), parseFloat(pnt.value, 10)])
-                    });
+                    ', past '+$("#timeRange").val();
+
+                    if (noIntervalText.indexOf(metric.metricName) === -1){
+                        subtitleString = subtitleString + ' ('+metric.interval+'m interval)';
+                    }
+
+                    if ($("#compareToPrevious").prop('checked')){
+
+
+
+                        for (i = 0; i < metric.datapoints.length/2 - 1; i++){
+                            previousPeriod.push([new Date(metric.datapoints[i + metric.datapoints.length/2].timestamp).getTime(), parseFloat(metric.datapoints[i].value, 10)]);
+                        }
+
+                        metric.datapoints.slice(metric.datapoints.length/2, metric.datapoints.length).forEach(function(pnt){
+                            thisPeriod.push([new Date(pnt.timestamp).getTime(), parseFloat(pnt.value, 10)])
+                        });
+
+                        series.push({
+                            'name': 'Current Period',
+                            'data': thisPeriod
+                        });
+                        series.push({
+                            'name': 'Previous Period',
+                            'data': previousPeriod
+                        });
+                    }
+                    else {
+                        metric.datapoints.forEach(function(pnt){
+                            thisPeriod.push([new Date(pnt.timestamp).getTime(), parseFloat(pnt.value, 10)])
+                        });
+                        series.push({
+                            'name': 'Current Period',
+                            'data': thisPeriod
+                        });
+                    }
+
                     charts[metric.metricName] = new Highcharts.Chart({
                         chart: {
                             renderTo: metric.metricName,
@@ -92,9 +134,7 @@
                         legend: {
                             enabled: false
                         },
-                        series: [{
-                            data: dataArray
-                        }]
+                        series: series
                     });
                 });
             });
@@ -104,8 +144,13 @@
             });
 
             $(document).ready(function(){
+
                 brandText = $(".brand").text();
                 $("#timeRange").change(function(){
+                    requestData('{{view}}');
+                    $("#currentTimeRange").text($("#timeRange").val());
+                })
+                $("#compareToPrevious").change(function(){
                     requestData('{{view}}');
                 })
                 requestData('{{view}}');
@@ -115,10 +160,12 @@
             })
 
             function requestData(view) {
+                compareToPrevious = ($("#compareToPrevious").checked === true) ? true : false;
                 timeRange = $("#timeRange").val();
                 socket.emit('requestData', {
                     'timeRange': timeRange,
-                    'view': view
+                    'view': view,
+                    'compareToPrevious': compareToPrevious
                 });
                 $("#pageName").text('loading...');
             }
@@ -192,11 +239,12 @@
                         <option value="1d">1d</option>
                         <option value="7d">7d</option>
                     </select>
-                    <div id="loading" class="loading"></div>
+                    <br/>
+                    <input type="checkbox" id="compareToPrevious">compare to previous <span id="currentTimeRange" />30m<br>
                 </div>
-                <div id="basic_stats">
+<!--                 <div id="basic_stats">
                     <h2>Basic Stats</h2>
-                </div>
+                </div> -->
             </div>
 
             {{#each metric_list}}
