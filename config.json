@@ -82,14 +82,5 @@
 		"PhantomQueue",
 		"ListeningCount"
 	],
-	"BasicStats": [{
-		"name": "Boatyard Captain",
-		"url": "http://captain.ex.fm:9000/",
-		"stats": {
-			"Start": "overall.start",
-			"End": "overall.end",
-			"Average Time": "overall.avgTime",
-			"Remaining": "overall.remaining"
-		}
-	}]
+	"BasicStats": []
 }
