@@ -18,6 +18,8 @@ var app = express(),
 
 nconf.file({'file': 'config.json'});
 
+io.set('transports', ['xhr-polling']);
+
 var	config,
 	cloudData = {},
 	defaultRange = 30,
