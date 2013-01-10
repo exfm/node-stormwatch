@@ -61,9 +61,11 @@ var MetricGraphView = Backbone.View.extend({
                 '#2da012', // green
                 '#333333', // Black
             ];
+
         series.forEach(function(s, index){
             s.color = colors[index];
         });
+        console.log(series);
 
 
         this.chartEl = $('<div class="chart" />');

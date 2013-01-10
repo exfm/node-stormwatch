@@ -34,12 +34,12 @@
             "thing": "hosts per AZ"
         },
         {
-            "id": "pro-python-instance-cpu",
+            "id": "prod-python-instance-cpu",
             "title": "Production Python App CPU",
             "namespace": "AWS/EC2",
             "name": "CPUUtilization",
             "type": "Average",
-            "unit": "Count",
+            "unit": "Percent",
             "dimensions": {
                 "ec2:tagged": {
                     "Environment": "production",

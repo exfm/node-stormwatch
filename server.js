@@ -70,26 +70,13 @@ app.get('/metric', function(req, res){
 app.get('/metric/:id', function(req, res){
     Metric.getById(req.param('id')).then(function(metric){
         var period = Number(req.param('period', 300)),
-            start = moment().subtract('hours', 3)._d;
+            start = moment().subtract('minutes', 300)._d;
 
         metric.loadAllSeriesData(period, start, new Date()).then(function(series){
             metric.series = series;
             res.send(metric);
         }, function(err){
             res.send(400, err.message);
-        });
-    }, function(err){
-        res.send(400, err.message);
-    });
-});
-
-app.get('/metric/:id/current', function(req, res){
-    Metric.getById(req.param('id')).then(function(metric){
-        var period = Number(req.param('period', 60)),
-            start = moment().subtract('minutes', 1)._d;
-        metric.loadAllSeriesData(period, start, new Date()).then(function(series){
-            metric.series = series;
-            res.send(metric);
         });
     }, function(err){
         res.send(400, err.message);
