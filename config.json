@@ -72,5 +72,21 @@
             "unit": "Count",
             "thing": "listeners"
         }
+    ],
+    "graphs": [
+        {
+            "title": "listeners",
+            "metrics": [
+                "SW/Exfm::ListeningCount",
+            ]
+        },
+        {
+            "title": "Queues",
+            "metrics": [
+                "SW/Rabbit::CeleryQueue",
+                "SW/Rabbit::MetadataQueue",
+                "SW/Rabbit::PhantomQueue",
+            ]
+        }
     ]
 }
