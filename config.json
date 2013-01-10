@@ -49,6 +49,21 @@
             "thing": "percent"
         },
         {
+            "id": "prod-worker-instance-cpu",
+            "title": "Production Worker CPU",
+            "namespace": "AWS/EC2",
+            "name": "CPUUtilization",
+            "type": "Average",
+            "unit": "Percent",
+            "dimensions": {
+                "ec2:tagged": {
+                    "Environment": "production",
+                    "Service Name": "pythonworker"
+                }
+            },
+            "thing": "percent"
+        },
+        {
             "id": "rabbit-celery-queue",
             "namespace": "SW/Rabbit",
             "name": "CeleryQueue",
@@ -103,6 +118,13 @@
             "title": "Production Python App CPU",
             "metrics": [
                 "prod-python-instance-cpu"
+            ]
+        },
+        {
+            "id": "prod-worker-instance-cpu",
+            "title": "Production Worker CPU",
+            "metrics": [
+                "prod-worker-instance-cpu"
             ]
         }
     ]
