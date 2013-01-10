@@ -8,7 +8,9 @@ var express = require('express'),
     nconf = require('nconf').file({'file': 'config.json'}),
     aws = require('plata'),
     getConfig = require('junto'),
-    Metric = require('./model'),
+    model = require('./model'),
+    Metric = model.Metric,
+    Graph = model.Graph,
     moment = require('moment'),
     fs = require('fs'),
     metrics;
@@ -52,6 +54,7 @@ app.configure(function(){
     });
 
     Metric.fromConfig(nconf.get('metrics'));
+    Graph.fromConfig(nconf.get("graphs"));
 });
 
 app.get('/', function(req, res){
@@ -89,6 +92,12 @@ app.get('/metric/:id/current', function(req, res){
         });
     }, function(err){
         res.send(400, err.message);
+    });
+});
+
+app.get('/graph', function(req, res){
+    Graph.getAll().then(function(graphs){
+        res.send(graphs);
     });
 });
 

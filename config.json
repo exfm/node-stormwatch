@@ -1,6 +1,7 @@
 {
     "metrics": [
         {
+            "id": "elb-latency",
             "namespace": "AWS/ELB",
             "name": "Latency",
             "type": "Average",
@@ -11,6 +12,7 @@
             "thing": "seconds"
         },
         {
+            "id": "elb-requests",
             "namespace": "AWS/ELB",
             "name": "RequestCount",
             "type": "Sum",
@@ -21,6 +23,7 @@
             "thing": "requests"
         },
         {
+            "id": "elb-healthy-hosts",
             "namespace": "AWS/ELB",
             "name": "HealthyHostCount",
             "type": "Average",
@@ -31,6 +34,7 @@
             "thing": "hosts per AZ"
         },
         {
+            "id": "pro-python-instance-cpu",
             "title": "Production Python App CPU",
             "namespace": "AWS/EC2",
             "name": "CPUUtilization",
@@ -45,6 +49,7 @@
             "thing": "percent"
         },
         {
+            "id": "rabbit-celery-queue",
             "namespace": "SW/Rabbit",
             "name": "CeleryQueue",
             "type": "Average",
@@ -52,6 +57,7 @@
             "thing": "messages"
         },
         {
+            "id": "rabbit-metadata-queue",
             "namespace": "SW/Rabbit",
             "name": "MetadataQueue",
             "type": "Average",
@@ -59,6 +65,7 @@
             "thing": "messages"
         },
         {
+            "id": "rabbit-phantom-queue",
             "namespace": "SW/Rabbit",
             "name": "PhantomQueue",
             "type": "Average",
@@ -66,6 +73,7 @@
             "thing": "messages"
         },
         {
+            "id": "listeners",
             "namespace": "SW/Exfm",
             "name": "ListeningCount",
             "type": "Average",
@@ -77,15 +85,15 @@
         {
             "title": "listeners",
             "metrics": [
-                "SW/Exfm::ListeningCount"
+                "listeners"
             ]
         },
         {
             "title": "Queues",
             "metrics": [
-                "SW/Rabbit::CeleryQueue",
-                "SW/Rabbit::MetadataQueue",
-                "SW/Rabbit::PhantomQueue"
+                "rabbit-celery-queue",
+                "rabbit-metadata-queue",
+                "rabbit-phantom-queue"
             ]
         }
     ]
