@@ -15,13 +15,6 @@ var GraphCollection = Backbone.Collection.extend({
     url: '/graph'
 });
 
-var GraphView = Backbone.View.extend({
-    className: 'chart-container',
-    render: function(){
-
-    }
-});
-
 var Metric = Backbone.Model.extend({
     url: function(){
         return "/metric/" + this.get('id');
@@ -33,7 +26,7 @@ var MetricCollection = Backbone.Collection.extend({
     url: '/metric'
 });
 
-var MetricGraphView = Backbone.View.extend({
+var GraphView = Backbone.View.extend({
     className: 'chart-container',
     render: function(){
         var self = this,
@@ -60,12 +53,9 @@ var MetricGraphView = Backbone.View.extend({
                 '#D4D4D3', // gray
                 '#2da012', // green
                 '#333333', // Black
-            ], maxPoints = 0;
+            ];
 
         series.forEach(function(s, index){
-            if(s.data.length > maxPoints){
-                maxPoints = s.data;
-            }
             s.color = colors[index];
         });
         Rickshaw.Series.zeroFill(series);
@@ -124,15 +114,6 @@ var MetricGraphView = Backbone.View.extend({
                 graph: this.graph,
                 element: this.legendEl.get(0)
             });
-            // this.shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
-            //     graph: this.graph,
-            //     legend: this.legend
-            // });
-
-            // this.order = new Rickshaw.Graph.Behavior.Series.Order({
-            //     graph: this.graph,
-            //     legend: this.legend
-            // });
 
             this.highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
                 graph: this.graph,
@@ -145,13 +126,13 @@ var MetricGraphView = Backbone.View.extend({
     }
 });
 
-new MetricCollection().fetch({
+new GraphCollection().fetch({
     'success': function(collection, response, options){
-        collection.models.forEach(function(m){
-            m.fetch({
+        collection.models.forEach(function(g){
+            g.fetch({
                 'success': function(model, response, options){
                     $('#app').append(
-                        new MetricGraphView({model: model}).render().el);
+                        new GraphView({model: model}).render().el);
                 }
             });
         });

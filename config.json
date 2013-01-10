@@ -84,7 +84,7 @@
     "graphs": [
         {
             "id": "listeners",
-            "title": "listeners",
+            "title": "Listeners",
             "metrics": [
                 "listeners"
             ]
@@ -96,6 +96,13 @@
                 "rabbit-celery-queue",
                 "rabbit-metadata-queue",
                 "rabbit-phantom-queue"
+            ]
+        },
+        {
+            "id": "prod-python-instance-cpu",
+            "title": "Production Python App CPU",
+            "metrics": [
+                "prod-python-instance-cpu"
             ]
         }
     ]

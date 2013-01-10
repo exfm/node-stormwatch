@@ -54,7 +54,7 @@ app.configure(function(){
     });
 
     Metric.fromConfig(nconf.get('metrics'));
-    // Graph.fromConfig(nconf.get("graphs"));
+    Graph.fromConfig(nconf.get("graphs"));
 });
 
 app.get('/', function(req, res){
@@ -86,6 +86,23 @@ app.get('/metric/:id', function(req, res){
 app.get('/graph', function(req, res){
     Graph.getAll().then(function(graphs){
         res.send(graphs);
+    });
+});
+
+app.get('/graph/:id', function(req, res){
+    Graph.getById(req.param('id')).then(function(graph){
+        var period = Number(req.param('period', 300)),
+            start = moment().subtract('minutes', 300)._d;
+
+        graph.loadAllSeriesData(period, start, new Date()).then(function(data){
+            graph.series = data.series;
+            graph.metrics = data.metrics;
+            res.send(graph);
+        }, function(err){
+            res.send(400, err.message);
+        });
+    }, function(err){
+        res.send(400, err.message);
     });
 });
 
