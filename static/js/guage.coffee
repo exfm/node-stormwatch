@@ -2,6 +2,7 @@
 # CoffeeScript version of http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 do () ->
     vendors = ['ms', 'moz', 'webkit', 'o']
+    window = window or {}
     for vendor in vendors
         if window.requestAnimationFrame
             break
@@ -12,7 +13,7 @@ do () ->
     lastId = 0
     isCancelled = {}
 
-    if not requestAnimationFrame
+    if not window.requestAnimationFrame
         window.requestAnimationFrame = (callback, element) ->
             currTime = new Date().getTime()
             timeToCall = Math.max(0, 16 - (currTime - lastTime))
@@ -384,7 +385,7 @@ class Donut extends BaseDonut
         @options.strokeColor = @strokeGradient(w, h, start, stop)
         return @
 
-window.AnimationUpdater =
+AnimationUpdater =
     elements: []
     animId: null
 
@@ -405,7 +406,7 @@ window.AnimationUpdater =
         else
             cancelAnimationFrame(AnimationUpdater.animId)
 
-window.Gauge = Gauge
-window.Donut = Donut
-window.BaseDonut = BaseDonut
-window.TextRenderer = TextRenderer
+module.exports.Gauge = Gauge
+module.exports.Donut = Donut
+module.exports.BaseDonut = BaseDonut
+module.exports.TextRenderer = TextRenderer

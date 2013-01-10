@@ -2,7 +2,9 @@
 
 var $ = require('jquery'),
     Backbone = require('backbone'),
-    Rickshaw = require('rickshaw');
+    Rickshaw = require('rickshaw'),
+    gauge = require('./gauge.js'),
+    Gauge = gauge.Gauge;
 
 var Graph = Backbone.Model.extend({
     url: function(){
@@ -29,6 +31,34 @@ var MetricCollection = Backbone.Collection.extend({
 var GraphView = Backbone.View.extend({
     className: 'chart-container',
     render: function(){
+        this.$el.append('<h3>'+this.model.get('title')+'</h3>');
+
+        if(this.model.get('title') === 'Listeners'){
+            this.canvasEl = $('<canvas width="220" height="70" />');
+            this.counterEl = $('<div class="counter" />');
+            this.$el.append(this.canvasEl);
+            this.$el.append(this.counterEl);
+            var opts = {
+              lines: 12, // The number of lines to draw
+              angle: 0.35, // The length of each line
+              lineWidth: 0.1, // The line thickness
+              pointer: {
+                length: 0.9, // The radius of the inner circle
+                strokeWidth: 0.035, // The rotation offset
+                color: '#333333' // Fill color
+              },
+              colorStart: '#0088cc',   // Colors
+              colorStop: '#0088cc',    // just experiment with them
+              strokeColor: '#D4D4D3',   // to see which ones work best for you
+              generateGradient: true
+            };
+            this.gauge = new Gauge(this.canvasEl.get(0)).setOptions(opts); // create sexy gauge!
+            this.gauge.maxValue = 3000; // set max gauge value
+            this.gauge.animationSpeed = 32; // set animation speed (32 is default value)
+            this.gauge.set(2325); // set actual value
+            this.gauge.setTextField(this.counterEl.get(0));
+            return this;
+        }
         var self = this,
             graphWidth = $('#app').width(),
             series = this.model.get('series'),
@@ -66,7 +96,6 @@ var GraphView = Backbone.View.extend({
         this.chartEl = $('<div class="chart" />');
         this.yAxisEl = $('<div class="yaxis" />');
 
-        this.$el.append('<h3>'+this.model.get('title')+'</h3>');
         this.$el.append(this.yAxisEl);
         this.$el.append(this.chartEl);
 
