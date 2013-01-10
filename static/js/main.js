@@ -60,12 +60,17 @@ var MetricGraphView = Backbone.View.extend({
                 '#D4D4D3', // gray
                 '#2da012', // green
                 '#333333', // Black
-            ];
+            ], maxPoints = 0;
 
         series.forEach(function(s, index){
+            if(s.data.length > maxPoints){
+                maxPoints = s.data;
+            }
             s.color = colors[index];
         });
-        console.log(series);
+        Rickshaw.Series.zeroFill(series);
+
+        console.log(this.model);
 
 
         this.chartEl = $('<div class="chart" />');
@@ -111,6 +116,29 @@ var MetricGraphView = Backbone.View.extend({
             graph: this.graph
         });
         // this.axes.render();
+        if(series.length > 1){
+            this.legendEl = $('<div class="legend" />');
+            this.$el.append(this.legendEl);
+
+            this.legend = new Rickshaw.Graph.Legend({
+                graph: this.graph,
+                element: this.legendEl.get(0)
+            });
+            // this.shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
+            //     graph: this.graph,
+            //     legend: this.legend
+            // });
+
+            // this.order = new Rickshaw.Graph.Behavior.Series.Order({
+            //     graph: this.graph,
+            //     legend: this.legend
+            // });
+
+            this.highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+                graph: this.graph,
+                legend: this.legend
+            });
+        }
 
 
         return this;
