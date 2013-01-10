@@ -70,6 +70,8 @@ app.get('/metric/:id', function(req, res){
         metric.getDataPoints(period, start, new Date()).then(function(data){
             metric.data = data;
             res.send(metric);
+        }, function(err){
+            res.send(400, err.message);
         });
     }, function(err){
         res.send(400, err.message);

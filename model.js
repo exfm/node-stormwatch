@@ -4,7 +4,7 @@ var when = require('when'),
     aws = require('plata'),
     crypto = require('crypto'),
     util = require('util'),
-    Store = require('./store'),
+    Store = require('./lib/store'),
     Index = Store.Index;
 
 // {
