@@ -17,12 +17,11 @@
     "when": "git://github.com/exfm/when.git",
     "superagent": "0.9.7",
     "junto": "git+ssh://git@github.com/exfm/node-junto.git",
-    "plata": "git://github.com/grmnygrmny/node-plata.git",
-    "weatherman": "git://github.com/exfm/node-weatherman.git",
+    "plata": "0.0.23",
     "sequence": "2.2.1",
     "socket.io": "0.9.10",
     "nconf": "0.6.4",
-    "handlebars": "1.0.7"
+    "hbs": "2.0.1"
   },
   "devDependencies": {},
   "optionalDependencies": {},

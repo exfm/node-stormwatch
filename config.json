@@ -1,86 +1,68 @@
 {
-	"ELBMetrics": [
-		{
-			"namespace": "AWS/ELB",
-			"metricName": "Latency",
-			"metricType": "Average",
-			"unit": "Seconds",
-			"unitLabel": "s",
-			"range": [0, 10],
-			"dimensions": {
-				"LoadBalancerName": "production"
-			}
-		},
-		{
-			"namespace": "AWS/ELB",
-			"metricName": "RequestCount",
-			"metricType": "Sum",
-			"unit": "Count",
-			"unitLabel": "",
-			"range": [null, null],
-			"dimensions": {
-				"LoadBalancerName": "production"
-			}
-		},
-		{
-			"namespace": "AWS/ELB",
-			"metricName": "HealthyHostCount",
-			"metricType": "Average",
-			"unit": "Count",
-			"unitLabel": "",
-			"range": [0, 10],
-			"dimensions": {
-				"LoadBalancerName": "production"
-			}
-		}
-	],
-	"EC2Metrics": [
-
-	],
-	"CustomMetrics": [
-		{
-			"namespace": "SW/Rabbit",
-			"metricName": "CeleryQueue",
-			"metricType": "Average",
-			"unit": "Count",
-			"unitLabel": "",
-			"range": [0, null]
-		},
-		{
-			"namespace": "SW/Rabbit",
-			"metricName": "MetadataQueue",
-			"metricType": "Average",
-			"unit": "Count",
-			"unitLabel": "",
-			"range": [0, null]
-		},
-		{
-			"namespace": "SW/Rabbit",
-			"metricName": "PhantomQueue",
-			"metricType": "Average",
-			"unit": "Count",
-			"unitLabel": "",
-			"range": [0, null]
-		},
-		{
-			"namespace": "SW/Exfm",
-			"metricName": "ListeningCount",
-			"metricType": "Average",
-			"unit": "Count",
-			"unitLabel": "",
-			"range": [0, null]
-		}
-	],
-	"Basic": [
-		"Latency",
-		"RequestCount",
-		"HealthyHostCount"
-	],
-	"Detailed": [
-		"CeleryQueue",
-		"MetadataQueue",
-		"PhantomQueue",
-		"ListeningCount"
-	],
-	"BasicStats": []
+    "metrics": [
+        {
+            "namespace": "AWS/ELB",
+            "name": "Latency",
+            "type": "Average",
+            "unit": "Seconds",
+            "dimensions": {
+                "LoadBalancerName": "production"
+            }
+        },
+        {
+            "namespace": "AWS/ELB",
+            "name": "RequestCount",
+            "type": "Sum",
+            "unit": "Count",
+            "dimensions": {
+                "LoadBalancerName": "production"
+            }
+        },
+        {
+            "namespace": "AWS/ELB",
+            "name": "HealthyHostCount",
+            "type": "Average",
+            "unit": "Count",
+            "dimensions": {
+                "LoadBalancerName": "production"
+            }
+        },
+        {
+            "title": "Production Python App CPU",
+            "namespace": "AWS/EC2",
+            "name": "CPUUtilization",
+            "type": "Average",
+            "unit": "Count",
+            "dimensions": {
+                "ec2:tagged": {
+                    "Environment": "production",
+                    "Service Name": "pythonapp"
+                }
+            }
+        },
+        {
+            "namespace": "SW/Rabbit",
+            "name": "CeleryQueue",
+            "type": "Average",
+            "unit": "Count"
+        },
+        {
+            "namespace": "SW/Rabbit",
+            "name": "MetadataQueue",
+            "type": "Average",
+            "unit": "Count"
+        },
+        {
+            "namespace": "SW/Rabbit",
+            "name": "PhantomQueue",
+            "type": "Average",
+            "unit": "Count"
+        },
+        {
+            "namespace": "SW/Exfm",
+            "name": "ListeningCount",
+            "type": "Average",
+            "unit": "Count"
+        }
+    ]
 }
