@@ -83,12 +83,14 @@
     ],
     "graphs": [
         {
+            "id": "listeners",
             "title": "listeners",
             "metrics": [
                 "listeners"
             ]
         },
         {
+            "id": "queues",
             "title": "Queues",
             "metrics": [
                 "rabbit-celery-queue",

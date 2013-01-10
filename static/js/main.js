@@ -4,6 +4,24 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     Rickshaw = require('rickshaw');
 
+var Graph = Backbone.Model.extend({
+    url: function(){
+        return "/graph/" + this.get('id');
+    }
+});
+
+var GraphCollection = Backbone.Collection.extend({
+    model: Graph,
+    url: '/graph'
+});
+
+var GraphView = Backbone.View.extend({
+    className: 'chart-container',
+    render: function(){
+
+    }
+});
+
 var Metric = Backbone.Model.extend({
     url: function(){
         return "/metric/" + this.get('id');
