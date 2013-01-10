@@ -28,4 +28,8 @@ describe "Metric", ()->
         assert m.dims[0].service == 'ec2'
         assert m.dims[0].method == 'tagged'
 
-        done()
+        m.dims[0].getValues().then (res)->
+
+            assert Array.isArray(res)
+            assert res.length > 1
+            done()
