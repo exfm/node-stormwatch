@@ -8,7 +8,7 @@ var express = require('express'),
     nconf = require('nconf').file({'file': 'config.json'}),
     aws = require('plata'),
     getConfig = require('junto'),
-    model = require('./model'),
+    model = require('./lib/model'),
     Metric = model.Metric,
     Graph = model.Graph,
     moment = require('moment'),
@@ -54,7 +54,7 @@ app.configure(function(){
     });
 
     Metric.fromConfig(nconf.get('metrics'));
-    Graph.fromConfig(nconf.get("graphs"));
+    // Graph.fromConfig(nconf.get("graphs"));
 });
 
 app.get('/', function(req, res){
@@ -69,10 +69,11 @@ app.get('/metric', function(req, res){
 
 app.get('/metric/:id', function(req, res){
     Metric.getById(req.param('id')).then(function(metric){
-        var period = Number(req.param('period', 60)),
+        var period = Number(req.param('period', 300)),
             start = moment().subtract('hours', 3)._d;
-        metric.getDataPoints(period, start, new Date()).then(function(data){
-            metric.data = data;
+
+        metric.loadAllSeriesData(period, start, new Date()).then(function(series){
+            metric.series = series;
             res.send(metric);
         }, function(err){
             res.send(400, err.message);
@@ -86,8 +87,8 @@ app.get('/metric/:id/current', function(req, res){
     Metric.getById(req.param('id')).then(function(metric){
         var period = Number(req.param('period', 60)),
             start = moment().subtract('minutes', 1)._d;
-        metric.getDataPoints(period, start, new Date()).then(function(data){
-            metric.data = data;
+        metric.loadAllSeriesData(period, start, new Date()).then(function(series){
+            metric.series = series;
             res.send(metric);
         });
     }, function(err){

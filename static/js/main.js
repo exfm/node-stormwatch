@@ -37,7 +37,34 @@ var MetricGraphView = Backbone.View.extend({
     className: 'chart-container',
     render: function(){
         var self = this,
-            graphWidth = $('#app').width();
+            graphWidth = $('#app').width(),
+            series = this.model.get('series'),
+            colors = [
+                '#e53003', // red
+                '#0088cc', // blue
+                '#D4D4D3', // gray
+                '#2da012', // green
+                '#333333', // Black
+                '#e53003', // red
+                '#0088cc', // blue
+                '#D4D4D3', // gray
+                '#2da012', // green
+                '#333333', // Black
+                '#e53003', // red
+                '#0088cc', // blue
+                '#D4D4D3', // gray
+                '#2da012', // green
+                '#333333', // Black
+                '#e53003', // red
+                '#0088cc', // blue
+                '#D4D4D3', // gray
+                '#2da012', // green
+                '#333333', // Black
+            ];
+        series.forEach(function(s, index){
+            s.color = colors[index];
+        });
+
 
         this.chartEl = $('<div class="chart" />');
         this.yAxisEl = $('<div class="yaxis" />');
@@ -50,15 +77,16 @@ var MetricGraphView = Backbone.View.extend({
             element: this.chartEl.get(0),
             renderer: 'line',
             width: graphWidth,
-            series: [{
-                    data: this.model.get('data'),
-                    // color: '#e53003', // red
-                    // color: '#0088cc', // blue
-                    // color: '#D4D4D3', // gray
-                    // color: '#2da012', // green
-                    color: '#333333', // Black
-                    name: this.model.get('title')
-            }]
+            series: series
+            // series: [{
+            //         data: this.model.get('data'),
+            //         // color: '#e53003', // red
+            //         // color: '#0088cc', // blue
+            //         // color: '#D4D4D3', // gray
+            //         // color: '#2da012', // green
+            //         color: '#333333', // Black
+            //         name: this.model.get('title')
+            // }]
         });
 
         this.yAxis = new Rickshaw.Graph.Axis.Y({

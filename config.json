@@ -27,7 +27,7 @@
             "namespace": "AWS/ELB",
             "name": "HealthyHostCount",
             "type": "Average",
-            "unit": "Count",
+            "unit": "Percent",
             "dimensions": {
                 "LoadBalancerName": "production"
             },
