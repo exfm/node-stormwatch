@@ -25,6 +25,7 @@ var MetricGraphView = Backbone.View.extend({
                     color: 'steelblue'
             }]
         }).render();
+        return this;
     }
 });
 
@@ -33,7 +34,8 @@ new MetricCollection().fetch({
         collection.models.forEach(function(m){
             m.fetch({
                 'success': function(model, response, options){
-                    new MetricGraphView({model: model}).render();
+                    $('#app').append(
+                        new MetricGraphView({model: model}).render().el);
                 }
             });
         });
