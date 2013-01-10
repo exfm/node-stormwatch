@@ -22,3 +22,4 @@ CloudWatch client and metrics gatherer
  * Update data over socket.io every 60 secs
  * How to represent deltas?
  * How to represent new highs?
+ * Allow setting "high" on a graph.  Think lke mocha --slow opt.  Approaching high = red, mid = beige/gray, low = light grey. That way color is an indicator of what you should actually be paying attention to.

@@ -77,7 +77,7 @@
         {
             "title": "listeners",
             "metrics": [
-                "SW/Exfm::ListeningCount",
+                "SW/Exfm::ListeningCount"
             ]
         },
         {
@@ -85,7 +85,7 @@
             "metrics": [
                 "SW/Rabbit::CeleryQueue",
                 "SW/Rabbit::MetadataQueue",
-                "SW/Rabbit::PhantomQueue",
+                "SW/Rabbit::PhantomQueue"
             ]
         }
     ]

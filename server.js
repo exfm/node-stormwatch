@@ -19,7 +19,8 @@ function createBundle(watch){
     var rebuildLock = false,
         b = browserify('./static/js/main.js', {
             require : {jquery: 'jquery-browserify', backbone: 'backbone-browserify-lodash'},
-            'watch': watch
+            'watch': watch,
+            'debug': true
         });
     if(watch){
         b.on('bundle', function(){

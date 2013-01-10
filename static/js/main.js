@@ -24,7 +24,7 @@ var MetricGraphView = Backbone.View.extend({
         this.chartEl = $('<div class="chart" />');
         this.yAxisEl = $('<div class="yaxis" />');
 
-        this.$el.append('<h2>'+this.model.get('title')+'</h2>');
+        this.$el.append('<h3>'+this.model.get('title')+'</h3>');
         this.$el.append(this.yAxisEl);
         this.$el.append(this.chartEl);
 
@@ -34,7 +34,11 @@ var MetricGraphView = Backbone.View.extend({
             width: graphWidth,
             series: [{
                     data: this.model.get('data'),
-                    color: 'steelblue',
+                    // color: '#e53003', // red
+                    // color: '#0088cc', // blue
+                    // color: '#D4D4D3', // gray
+                    // color: '#2da012', // green
+                    color: '#333333', // Black
                     name: this.model.get('title')
             }]
         });
