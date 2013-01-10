@@ -16,15 +16,51 @@ var MetricCollection = Backbone.Collection.extend({
 });
 
 var MetricGraphView = Backbone.View.extend({
+    className: 'chart-container',
     render: function(){
+        var self = this,
+            graphWidth = $('#app').width();
+
+        this.chartEl = $('<div class="chart" />');
+        this.yAxisEl = $('<div class="yaxis" />');
+
+        this.$el.append('<h2>'+this.model.get('title')+'</h2>');
+        this.$el.append(this.yAxisEl);
+        this.$el.append(this.chartEl);
+
         this.graph = new Rickshaw.Graph({
-            element: this.el,
+            element: this.chartEl.get(0),
             renderer: 'line',
+            width: graphWidth,
             series: [{
                     data: this.model.get('data'),
-                    color: 'steelblue'
+                    color: 'steelblue',
+                    name: this.model.get('title')
             }]
-        }).render();
+        });
+
+        this.yAxis = new Rickshaw.Graph.Axis.Y({
+            graph: this.graph,
+            orientation: 'left',
+            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+            element: this.yAxisEl.get(0),
+        });
+
+        this.graph.render();
+
+        this.hoverDetail = new Rickshaw.Graph.HoverDetail( {
+            graph: this.graph,
+            yFormatter: function(y) {
+                return y + " " + self.model.get('thing');
+            }
+        });
+
+        this.axes = new Rickshaw.Graph.Axis.Time( {
+            graph: this.graph
+        });
+        // this.axes.render();
+
+
         return this;
     }
 });

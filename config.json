@@ -7,7 +7,8 @@
             "unit": "Seconds",
             "dimensions": {
                 "LoadBalancerName": "production"
-            }
+            },
+            "thing": "seconds"
         },
         {
             "namespace": "AWS/ELB",
@@ -16,7 +17,8 @@
             "unit": "Count",
             "dimensions": {
                 "LoadBalancerName": "production"
-            }
+            },
+            "thing": "requests"
         },
         {
             "namespace": "AWS/ELB",
@@ -25,7 +27,8 @@
             "unit": "Count",
             "dimensions": {
                 "LoadBalancerName": "production"
-            }
+            },
+            "thing": "hosts per AZ"
         },
         {
             "title": "Production Python App CPU",
@@ -38,31 +41,36 @@
                     "Environment": "production",
                     "Service Name": "pythonapp"
                 }
-            }
+            },
+            "thing": "percent"
         },
         {
             "namespace": "SW/Rabbit",
             "name": "CeleryQueue",
             "type": "Average",
-            "unit": "Count"
+            "unit": "Count",
+            "thing": "messages"
         },
         {
             "namespace": "SW/Rabbit",
             "name": "MetadataQueue",
             "type": "Average",
-            "unit": "Count"
+            "unit": "Count",
+            "thing": "messages"
         },
         {
             "namespace": "SW/Rabbit",
             "name": "PhantomQueue",
             "type": "Average",
-            "unit": "Count"
+            "unit": "Count",
+            "thing": "messages"
         },
         {
             "namespace": "SW/Exfm",
             "name": "ListeningCount",
             "type": "Average",
-            "unit": "Count"
+            "unit": "Count",
+            "thing": "listeners"
         }
     ]
 }

@@ -31,14 +31,16 @@ var when = require('when'),
 //         }
 //     }
 // }
-function Metric(title, namespace, name, type, unit, dimensions){
+function Metric(title, data){
     this.title = title;
     this.id = crypto.createHash('sha1').update(this.title).digest('hex');
-    this.namespace = namespace;
-    this.name = name;
-    this.type = type;
-    this.unit = unit;
-    this.dimensions = dimensions || {};
+
+    this.namespace = data.namespace;
+    this.name = data.name;
+    this.type = data.type;
+    this.unit = data.unit;
+    this.dimensions = data.dimensions || {};
+    this.thing = data.thing;
 }
 
 Metric.Store = new Store()
@@ -96,7 +98,7 @@ function prepare(datapoints){
         return 0;
     }).map(function(item){
         return {
-            'x': new Date(item.timestamp).getTime(),
+            'x': new Date(item.timestamp).getTime() / 1000,
             'y': (Number(item.sum) || Number(item.average))
         };
     });
@@ -106,8 +108,7 @@ module.exports = Metric;
 module.exports.fromConfig = function(data){
     return data.map(function(config){
         var title = config.title || [config.namespace, config.name].join(':'),
-        m = new Metric(title, config.namespace, config.name, config.type,
-            config.unit, config.dimensions);
+        m = new Metric(title, config);
         Metric.Store.insert(m);
         return m;
     });

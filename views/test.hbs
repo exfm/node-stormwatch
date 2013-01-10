@@ -1,10 +1,28 @@
 <html>
     <head>
+        <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
         <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="/static/css/nv.d3.css" rel="stylesheet">
+        <link href="/static/css/rickshaw.css" rel="stylesheet">
+        <link href="/static/css/main.css" rel="stylesheet">
     </head>
     <body>
+        <div class="container-narrow">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="#">Home</a></li>
+        </ul>
+        <h3 class="muted">stormwatch</h3>
+      </div>
+
+      <hr>
+
+      <div class="jumbotron">
         <div id="app"></div>
+      </div>
+
+      <hr>
+    </div> <!-- /container -->
 
         <script src="browserify.js"></script>
         <script src="/socket.io/socket.io.js"></script>

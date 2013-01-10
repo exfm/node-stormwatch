@@ -65,7 +65,7 @@ app.get('/metric', function(req, res){
 
 app.get('/metric/:id', function(req, res){
     Metric.getById(req.param('id')).then(function(metric){
-        var period = Number(req.param('period', 300)),
+        var period = Number(req.param('period', 60)),
             start = moment().subtract('hours', 3)._d;
         metric.getDataPoints(period, start, new Date()).then(function(data){
             metric.data = data;
@@ -80,7 +80,7 @@ app.get('/metric/:id', function(req, res){
 
 app.get('/metric/:id/current', function(req, res){
     Metric.getById(req.param('id')).then(function(metric){
-        var period = Number(req.param('period', 300)),
+        var period = Number(req.param('period', 60)),
             start = moment().subtract('minutes', 1)._d;
         metric.getDataPoints(period, start, new Date()).then(function(data){
             metric.data = data;
