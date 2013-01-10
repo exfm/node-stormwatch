@@ -53,3 +53,24 @@ describe "Store", ()->
         assert.deepEqual store.indexKeys, ['id']
         assert.deepEqual store.indexes, 'id': index
         assert.deepEqual store.index('id'), index
+
+    it "should store an item", ()->
+        index = new Index 'id'
+        store = new Store
+        store.addIndex index
+        store.insert id: 1, title: 'Monkey Town'
+        assert.deepEqual store.items, {1: {'id': 1, 'title': 'Monkey Town'}}
+
+    it "should work for a simple query", (done)->
+        index = new Index 'title'
+        store = new Store
+        store.addIndex index
+        item =
+            id: 1
+            title: 'Monkey Town'
+        store.insert item
+
+        store.query(title: 'Monkey Town').then((res)->
+            assert.deepEqual res.items, [item]
+            done()
+        , done)
