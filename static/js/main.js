@@ -4,7 +4,8 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     Rickshaw = require('rickshaw'),
     gauge = require('./gauge.js'),
-    Gauge = gauge.Gauge;
+    Gauge = gauge.Gauge,
+    numbers = require('numbers');
 
 // For a series
 
@@ -17,22 +18,28 @@ var $ = require('jquery'),
 
 // Return min, max, median, mean
 function getSeriesStats(series){
-    var ret = {
-            'min': -1,
-            'max': -1,
-            'median': -1,
-            'mean': -1
-        },
+    var mins = [],
+        maxes = [],
+        means = [],
+        medians = [],
         sampleSize = series.length;
+
     series.forEach(function(s){
         var vals = s.data.map(function(point){
-                return point.y;
-            }),
-            min = Math.min.apply(Math, vals),
-            max = Math.max.apply(Math, vals);
-
-
+            return point.y;
+        });
+        mins.push(numbers.basic.min(vals));
+        maxes.push(numbers.basic.max(vals));
+        means.push(numbers.mean(vals));
+        medians.push(numbers.median(vals));
     });
+
+    return {
+        'min': numbers.mean(mins),
+        'max': numbers.mean(maxes),
+        'median': numbers.mean(medians),
+        'mean': numbers.mean(means)
+    };
 }
 
 var Graph = Backbone.Model.extend({
@@ -62,32 +69,14 @@ var GraphView = Backbone.View.extend({
     render: function(){
         this.$el.append('<h3>'+this.model.get('title')+'</h3>');
 
-        if(this.model.get('title') === 'Listeners'){
+
             this.canvasEl = $('<canvas width="220" height="70" />');
             this.counterEl = $('<div class="counter" />');
+
             this.$el.append(this.canvasEl);
             this.$el.append(this.counterEl);
-            var opts = {
-              lines: 12, // The number of lines to draw
-              angle: 0.35, // The length of each line
-              lineWidth: 0.1, // The line thickness
-              pointer: {
-                length: 0.9, // The radius of the inner circle
-                strokeWidth: 0.035, // The rotation offset
-                color: '#333333' // Fill color
-              },
-              colorStart: '#0088cc',   // Colors
-              colorStop: '#0088cc',    // just experiment with them
-              strokeColor: '#D4D4D3',   // to see which ones work best for you
-              generateGradient: true
-            };
-            this.gauge = new Gauge(this.canvasEl.get(0)).setOptions(opts); // create sexy gauge!
-            this.gauge.maxValue = 3000; // set max gauge value
-            this.gauge.animationSpeed = 32; // set animation speed (32 is default value)
-            this.gauge.set(2325); // set actual value
-            this.gauge.setTextField(this.counterEl.get(0));
-            return this;
-        }
+
+
         var self = this,
             graphWidth = $('#app').width(),
             series = this.model.get('series'),
@@ -112,15 +101,37 @@ var GraphView = Backbone.View.extend({
                 '#D4D4D3', // gray
                 '#2da012', // green
                 '#333333', // Black
-            ];
+            ],
+            gaugeOpts,
+            seriesStats;
 
         series.forEach(function(s, index){
             s.color = colors[index];
         });
         Rickshaw.Series.zeroFill(series);
 
-        console.log(this.model);
+        seriesStats = getSeriesStats(series);
 
+        gaugeOpts = {
+            lines: 12, // The number of lines to draw
+            angle: 0.35, // The length of each line
+            lineWidth: 0.1, // The line thickness
+            pointer: {
+                length: 0.9, // The radius of the inner circle
+                strokeWidth: 0.035, // The rotation offset
+                color: '#333333' // Fill color
+            },
+            colorStart: '#0088cc',   // Colors
+            colorStop: '#0088cc',    // just experiment with them
+            strokeColor: '#D4D4D3',   // to see which ones work best for you
+            generateGradient: true
+        };
+
+        this.gauge = new Gauge(this.canvasEl.get(0)).setOptions(gaugeOpts); // create sexy gauge!
+        this.gauge.maxValue = seriesStats.max; // set max gauge value
+        this.gauge.animationSpeed = 32; // set animation speed (32 is default value)
+        this.gauge.set(seriesStats.mean); // set actual value
+        this.gauge.setTextField(this.counterEl.get(0));
 
         this.chartEl = $('<div class="chart" />');
         this.yAxisEl = $('<div class="yaxis" />');
@@ -133,15 +144,6 @@ var GraphView = Backbone.View.extend({
             renderer: 'line',
             width: graphWidth,
             series: series
-            // series: [{
-            //         data: this.model.get('data'),
-            //         // color: '#e53003', // red
-            //         // color: '#0088cc', // blue
-            //         // color: '#D4D4D3', // gray
-            //         // color: '#2da012', // green
-            //         color: '#333333', // Black
-            //         name: this.model.get('title')
-            // }]
         });
 
         this.yAxis = new Rickshaw.Graph.Axis.Y({

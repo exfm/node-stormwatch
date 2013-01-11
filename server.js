@@ -95,6 +95,7 @@ app.get('/graph/:id', function(req, res){
             start = moment().subtract('minutes', 300)._d;
 
         graph.loadAllSeriesData(period, start, new Date()).then(function(data){
+            console.log('got series data');
             graph.series = data.series;
             graph.metrics = data.metrics;
             res.send(graph);
