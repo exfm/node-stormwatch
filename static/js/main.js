@@ -6,6 +6,35 @@ var $ = require('jquery'),
     gauge = require('./gauge.js'),
     Gauge = gauge.Gauge;
 
+// For a series
+
+//     [
+//         {
+//             'title': 'Listeners',
+//             'data': [{x: 1, y: 2}]
+//         }
+//     ]
+
+// Return min, max, median, mean
+function getSeriesStats(series){
+    var ret = {
+            'min': -1,
+            'max': -1,
+            'median': -1,
+            'mean': -1
+        },
+        sampleSize = series.length;
+    series.forEach(function(s){
+        var vals = s.data.map(function(point){
+                return point.y;
+            }),
+            min = Math.min.apply(Math, vals),
+            max = Math.max.apply(Math, vals);
+
+
+    });
+}
+
 var Graph = Backbone.Model.extend({
     url: function(){
         return "/graph/" + this.get('id');
