@@ -31,6 +31,9 @@
             socket.on('rebuild', function (data) {
                 location.reload();
             });
+            socket.on('reconnect', function(){
+              location.reload(); // Server code change
+            });
         </script>
     </body>
 </html>

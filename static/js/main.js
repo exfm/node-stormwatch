@@ -6,6 +6,7 @@ var $ = require('jquery'),
     gauge = require('./gauge.js'),
     Gauge = gauge.Gauge,
     numbers = require('numbers');
+    console.log(numbers);
 
 // For a series
 
@@ -30,15 +31,15 @@ function getSeriesStats(series){
         });
         mins.push(numbers.basic.min(vals));
         maxes.push(numbers.basic.max(vals));
-        means.push(numbers.mean(vals));
-        medians.push(numbers.median(vals));
+        means.push(numbers.statistic.mean(vals));
+        medians.push(numbers.statistic.median(vals));
     });
 
     return {
-        'min': numbers.mean(mins),
-        'max': numbers.mean(maxes),
-        'median': numbers.mean(medians),
-        'mean': numbers.mean(means)
+        'min': numbers.statistic.mean(mins),
+        'max': numbers.statistic.mean(maxes),
+        'median': numbers.statistic.mean(medians),
+        'mean': numbers.statistic.mean(means)
     };
 }
 

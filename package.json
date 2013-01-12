@@ -17,7 +17,7 @@
     "when": "1.7.1",
     "superagent": "0.9.7",
     "junto": "git+ssh://git@github.com/exfm/node-junto.git",
-    "plata": "0.0.23",
+    "plata": "0.0.26",
     "sequence": "2.2.1",
     "socket.io": "0.9.10",
     "nconf": "0.6.4",

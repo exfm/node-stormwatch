@@ -13,9 +13,11 @@ var express = require('express'),
     Graph = model.Graph,
     moment = require('moment'),
     fs = require('fs'),
-    metrics;
+    plog = require('plog');
 
-require('plog').all().level('silly');
+plog.all().level('error');
+plog.find(/^stormwatch/).level('silly');
+
 
 function createBundle(watch){
     var rebuildLock = false,
@@ -52,6 +54,7 @@ app.configure(function(){
         nconf.overrides(c);
         aws.connect(c.aws);
     });
+    app.use(express.logger({'format': 'tiny'}));
 
     Metric.fromConfig(nconf.get('metrics'));
     Graph.fromConfig(nconf.get("graphs"));
@@ -95,7 +98,7 @@ app.get('/graph/:id', function(req, res){
             start = moment().subtract('minutes', 300)._d;
 
         graph.loadAllSeriesData(period, start, new Date()).then(function(data){
-            console.log('got series data');
+
             graph.series = data.series;
             graph.metrics = data.metrics;
             res.send(graph);
