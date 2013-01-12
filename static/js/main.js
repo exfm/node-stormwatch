@@ -23,7 +23,8 @@ function getSeriesStats(series){
         maxes = [],
         means = [],
         medians = [],
-        sampleSize = series.length;
+        sampleSize = series.length,
+        currents = [];
 
     series.forEach(function(s){
         var vals = s.data.map(function(point){
@@ -33,13 +34,19 @@ function getSeriesStats(series){
         maxes.push(numbers.basic.max(vals));
         means.push(numbers.statistic.mean(vals));
         medians.push(numbers.statistic.median(vals));
+        // console.log(vals[(vals.length -1)], vals[(vals.length -2)]);
+        if(series.length > 1 && vals[(vals.length -1)] < 1){
+            currents.push(vals[(vals.length -2)]);
+        }
+        currents.push(vals[(vals.length -1)]);
     });
-
+    console.log(numbers.statistic.mean(currents));
     return {
         'min': numbers.statistic.mean(mins),
         'max': numbers.statistic.mean(maxes),
         'median': numbers.statistic.mean(medians),
-        'mean': numbers.statistic.mean(means)
+        'mean': numbers.statistic.mean(means),
+        'current': numbers.statistic.mean(currents)
     };
 }
 
@@ -71,11 +78,19 @@ var GraphView = Backbone.View.extend({
         this.$el.append('<h3>'+this.model.get('title')+'</h3>');
 
 
-            this.canvasEl = $('<canvas width="220" height="70" />');
-            this.counterEl = $('<div class="counter" />');
+        this.canvasEl = $('<canvas class="span2" width="210" height="70" />');
+        this.labelEl = $('<div class="span2" />');
+        this.counterEl = $('<span class="counter" />');
+        this.guageLabelEl = $('<span class="p"></div>');
+        this.guageEl = $('<div class="guages span4" />');
 
-            this.$el.append(this.canvasEl);
-            this.$el.append(this.counterEl);
+
+        $('#guages').append(this.guageEl);
+        this.guageEl.append(this.canvasEl);
+        this.guageEl.append(this.labelEl);
+        this.labelEl.append(this.counterEl);
+        this.labelEl.append(this.guageLabelEl);
+        this.guageEl.append('<div class="span2">'+this.model.get('title')+'</div>');
 
 
         var self = this,
@@ -131,7 +146,7 @@ var GraphView = Backbone.View.extend({
         this.gauge = new Gauge(this.canvasEl.get(0)).setOptions(gaugeOpts); // create sexy gauge!
         this.gauge.maxValue = seriesStats.max; // set max gauge value
         this.gauge.animationSpeed = 32; // set animation speed (32 is default value)
-        this.gauge.set(seriesStats.mean); // set actual value
+        this.gauge.set(seriesStats.current); // set actual value
         this.gauge.setTextField(this.counterEl.get(0));
 
         this.chartEl = $('<div class="chart" />');
@@ -159,9 +174,11 @@ var GraphView = Backbone.View.extend({
         this.hoverDetail = new Rickshaw.Graph.HoverDetail( {
             graph: this.graph,
             yFormatter: function(y) {
-                return y + " " + self.model.get('thing');
+                return y + " " + self.model.get('metrics')[0].thing;
             }
         });
+        var c = (self.model.get('metrics')[0].thing === 'percent') ? '%' : '';
+        this.guageLabelEl.html(c);
 
         this.axes = new Rickshaw.Graph.Axis.Time( {
             graph: this.graph
