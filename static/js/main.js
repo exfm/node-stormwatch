@@ -78,7 +78,7 @@ var GraphView = Backbone.View.extend({
         this.$el.append('<h3>'+this.model.get('title')+'</h3>');
 
 
-        this.canvasEl = $('<canvas class="span2" width="210" height="70" />');
+        this.canvasEl = $('<canvas width="140" height="50" />');
         this.labelEl = $('<div class="span2" />');
         this.counterEl = $('<span class="counter" />');
         this.guageLabelEl = $('<span class="p"></div>');
@@ -213,6 +213,9 @@ new GraphCollection().fetch({
                         new GraphView({model: model}).render().el);
                 }
             });
+            setInterval(function(){
+
+            }, 1000);
         });
     }
 });
