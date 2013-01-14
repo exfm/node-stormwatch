@@ -15,9 +15,9 @@ var express = require('express'),
     fs = require('fs'),
     plog = require('plog');
 
-plog.all().level('error');
-plog.find(/^stormwatch/).level('silly');
 
+// plog.find(/^stormwatch/).level('silly');
+plog.all().level('silly');
 
 function createBundle(watch){
     var rebuildLock = false,
