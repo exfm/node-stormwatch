@@ -1,5 +1,6 @@
 .chart-container {
     position: relative;
+    margin-bottom: 50px;
 }
 
 .chart {
@@ -7,8 +8,6 @@
 }
 .yaxis {
     position: absolute;
-    top: 0;
-    bottom: 0;
     width: 20px;
     left: -130px;
 }
@@ -46,4 +45,9 @@ margin: 60px 0;
 }
 .marketing p + h4 {
 margin-top: 28px;
+}
+
+.legend {
+    position: absolute;
+    right: 0;
 }

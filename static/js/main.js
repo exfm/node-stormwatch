@@ -151,11 +151,10 @@ var GraphView = Backbone.View.extend({
 
         this.yAxisEl = $('<div class="yaxis" />');
         this.chartEl = $('<div class="chart" />');
-
-        this.$el.append(this.yAxisEl);
-        this.$el.append(this.chartEl);
-
-
+        this.wrapEl = $('<div class="chart-wrap" />');
+        this.wrapEl.append(this.yAxisEl);
+        this.wrapEl.append(this.chartEl);
+        this.$el.append(this.wrapEl);
 
         this.graph = new Rickshaw.Graph({
             element: this.chartEl.get(0),
@@ -186,20 +185,20 @@ var GraphView = Backbone.View.extend({
             graph: this.graph
         });
         // this.axes.render();
-        if(series.length > 1){
-            this.legendEl = $('<div class="legend" />');
-            this.$el.append(this.legendEl);
+        // if(series.length > 1){
+        //     this.legendEl = $('<div class="legend" />');
+        //     this.$el.append(this.legendEl);
 
-            this.legend = new Rickshaw.Graph.Legend({
-                graph: this.graph,
-                element: this.legendEl.get(0)
-            });
+        //     this.legend = new Rickshaw.Graph.Legend({
+        //         graph: this.graph,
+        //         element: this.legendEl.get(0)
+        //     });
 
-            this.highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
-                graph: this.graph,
-                legend: this.legend
-            });
-        }
+        //     this.highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+        //         graph: this.graph,
+        //         legend: this.legend
+        //     });
+        // }
 
 
         return this;
