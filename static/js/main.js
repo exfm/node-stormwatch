@@ -82,7 +82,7 @@ var GraphView = Backbone.View.extend({
         this.labelEl = $('<div class="span2" />');
         this.counterEl = $('<span class="counter" />');
         this.guageLabelEl = $('<span class="p"></div>');
-        this.guageEl = $('<div class="guages span4" />');
+        this.guageEl = $('<div class="guages span3" />');
 
 
         $('#guages').append(this.guageEl);
