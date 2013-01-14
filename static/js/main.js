@@ -149,11 +149,13 @@ var GraphView = Backbone.View.extend({
         this.gauge.set(seriesStats.current); // set actual value
         this.gauge.setTextField(this.counterEl.get(0));
 
-        this.chartEl = $('<div class="chart" />');
         this.yAxisEl = $('<div class="yaxis" />');
+        this.chartEl = $('<div class="chart" />');
 
         this.$el.append(this.yAxisEl);
         this.$el.append(this.chartEl);
+
+
 
         this.graph = new Rickshaw.Graph({
             element: this.chartEl.get(0),
@@ -168,7 +170,7 @@ var GraphView = Backbone.View.extend({
             tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
             element: this.yAxisEl.get(0),
         });
-
+        console.log(this.chartEl);
         this.graph.render();
 
         this.hoverDetail = new Rickshaw.Graph.HoverDetail( {
