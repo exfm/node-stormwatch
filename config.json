@@ -126,6 +126,20 @@
             "metrics": [
                 "prod-worker-instance-cpu"
             ]
+        },
+        {
+            "id": "request-count",
+            "title": "ELB Requests",
+            "metrics": [
+                "elb-requests"
+            ]
+        },
+        {
+            "id": "latency",
+            "title": "Latency",
+            "metrics": [
+                "elb-requests"
+            ]
         }
     ]
 }
