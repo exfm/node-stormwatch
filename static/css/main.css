@@ -54,4 +54,11 @@ margin-top: 28px;
 
 .guages{
     background: #FEFEFE;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.guages canvas{
+    float: left;
 }
