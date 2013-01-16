@@ -138,7 +138,7 @@
             "id": "latency",
             "title": "Latency",
             "metrics": [
-                "elb-requests"
+                "elb-latency"
             ]
         }
     ]

@@ -16,9 +16,7 @@ CloudWatch client and metrics gatherer
 
 ## Todo
 
- * Declare graphs with multiple series
- * Declare gauges
- * Support meta metrics (?) How to do show me cpu show all prod web instances?
+ * Work templatify into server.js
  * Update data over socket.io every 60 secs
  * How to represent deltas?
  * How to represent new highs?
