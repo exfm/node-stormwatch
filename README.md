@@ -24,5 +24,3 @@ CloudWatch client and metrics gatherer
  * Add support for typing a metric to an AWS alarm to draw the red line
  * Map instance ids to instance names
  * Cache all instance info / describeInstance results
- * Everytime a user commits an action, add them to active monthly and daily sets.  Have weatherman push that to CW so we can see what times people are most active
- * For graphs with multiple series, add a gauge to the right with the last good average.
