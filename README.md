@@ -23,4 +23,5 @@ CloudWatch client and metrics gatherer
  * Allow setting "high" on a graph.  Think lke mocha --slow opt.  Approaching high = red, mid = beige/gray, low = light grey. That way color is an indicator of what you should actually be paying attention to.
  * Add support for typing a metric to an AWS alarm to draw the red line
  * Map instance ids to instance names
- * Cache all instance info / describeInstance results
+ * Cache all instance info / describeInstance results.  10 minutes?
+ * Annotate anything.  Programatically for deploys.
