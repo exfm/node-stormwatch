@@ -25,3 +25,4 @@ CloudWatch client and metrics gatherer
  * Map instance ids to instance names
  * Cache all instance info / describeInstance results.  10 minutes?
  * Annotate anything.  Programatically for deploys.
+ * Stacked line of ELB 4XX, 3XX, 5XX, 2XX
