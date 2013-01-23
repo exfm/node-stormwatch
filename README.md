@@ -26,3 +26,4 @@ CloudWatch client and metrics gatherer
  * Cache all instance info / describeInstance results.  10 minutes?
  * Annotate anything.  Programatically for deploys.
  * Stacked line of ELB 4XX, 3XX, 5XX, 2XX
+ * Draw aggregate of all series
