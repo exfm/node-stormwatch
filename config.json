@@ -23,6 +23,28 @@
             "thing": "requests"
         },
         {
+            "id": "elb-albumart-requests",
+            "namespace": "AWS/ELB",
+            "name": "RequestCount",
+            "type": "Sum",
+            "unit": "Count",
+            "dimensions": {
+                "LoadBalancerName": "albumart-ElasticLo-CJ2MLCDHXLSB"
+            },
+            "thing": "requests"
+        },
+        {
+            "id": "elb-albumart-latency",
+            "namespace": "AWS/ELB",
+            "name": "Latency",
+            "type": "Average",
+            "unit": "Seconds",
+            "dimensions": {
+                "LoadBalancerName": "albumart-ElasticLo-CJ2MLCDHXLSB"
+            },
+            "thing": "seconds"
+        },
+        {
             "id": "elb-healthy-hosts",
             "namespace": "AWS/ELB",
             "name": "HealthyHostCount",
@@ -44,6 +66,20 @@
                 "ec2:tagged": {
                     "Environment": "production",
                     "Service Name": "pythonapp"
+                }
+            },
+            "thing": "percent"
+        },
+        {
+            "id": "albumart-instance-cpu",
+            "title": "Album Art CPU",
+            "namespace": "AWS/EC2",
+            "name": "CPUUtilization",
+            "type": "Average",
+            "unit": "Percent",
+            "dimensions": {
+                "ec2:tagged": {
+                    "Service Name": "albumart"
                 }
             },
             "thing": "percent"
@@ -139,6 +175,27 @@
             "title": "Latency",
             "metrics": [
                 "elb-latency"
+            ]
+        },
+        {
+            "id": "albumart-request-count",
+            "title": "Album Art Requests",
+            "metrics": [
+                "elb-albumart-requests"
+            ]
+        },
+        {
+            "id": "albumart-latency",
+            "title": "Album Art Latency",
+            "metrics": [
+                "elb-albumart-latency"
+            ]
+        },
+        {
+            "id": "albumart-instance-cpu",
+            "title": "Album Art CPU",
+            "metrics": [
+                "albumart-instance-cpu"
             ]
         }
     ]
