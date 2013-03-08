@@ -7,7 +7,7 @@
             "type": "Average",
             "unit": "Seconds",
             "dimensions": {
-                "LoadBalancerName": "production"
+                "LoadBalancerName": "production-03082013"
             },
             "thing": "seconds"
         },
@@ -18,7 +18,7 @@
             "type": "Sum",
             "unit": "Count",
             "dimensions": {
-                "LoadBalancerName": "production"
+                "LoadBalancerName": "production-03082013"
             },
             "thing": "requests"
         },
@@ -51,7 +51,7 @@
             "type": "Average",
             "unit": "Percent",
             "dimensions": {
-                "LoadBalancerName": "production"
+                "LoadBalancerName": "production-03082013"
             },
             "thing": "hosts per AZ"
         },
