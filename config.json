@@ -125,7 +125,7 @@
         },
         {
             "id": "listeners",
-            "namespace": "SW/Exfm",
+            "namespace": "exfm",
             "name": "ListeningCount",
             "type": "Average",
             "unit": "Count",
